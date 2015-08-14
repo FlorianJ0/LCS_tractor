@@ -258,8 +258,20 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         # print LA.eigvals(gdphi[20, 20, :,:])
 
     eigenValues,eigenVectors=LA.eig(gdphi)
+    # for i in xrange(nnx):
+    #     for j in xrange(nny):
+    #         idx = eigenValues[i,j].argsort()[::-1]
+    #         if idx[0]!=0:
+    #             print i,j, idx,'EIG NOT ORDERED DAMMIT'
     print 'eigvect shape', eigenVectors.shape
     print 'eigval shape', eigenValues.shape
+
+    eig_vals_sorted = np.sort(eigenValues)
+    eig_vecs_sorted = eigenVectors[eigenValues.argsort()]
+    eigenValues = eig_vals_sorted
+    eigenVectors = eig_vecs_sorted
+    del eig_vals_sorted
+    del eig_vecs_sorted
 
     f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
     # print didx.shape
@@ -276,8 +288,8 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     # print grid_i[0, 5, :]- grid_iini[0, 5, :]
     ax1.imshow(uu)
     ax2.imshow(vv)
-    ax3.imshow(ww)
-    ax4.imshow(eigenValues[:,:,1])
+    ax3.imshow(eigenValues[:,:,0])
+    ax4.imshow(eigenValues[:,:,2])
 
     plt.show()
 

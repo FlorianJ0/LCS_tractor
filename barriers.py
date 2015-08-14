@@ -36,7 +36,7 @@ def barrier_type(toto, eigval, eigvec, tphys, dt, nx, ny, nz, domain, simtstep):
         # halp[<1e-4]=0
 
         ax1.imshow(np.abs(halp))
-        ax2.imshow(eigval[:,:,0])
+        ax2.imshow(eigval[:,:,3])
         plt.show()
         # r = eigenVectors[0]
     elif toto == 1:
