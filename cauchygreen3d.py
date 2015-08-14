@@ -285,7 +285,6 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     U = interpU_i[:, :, 0, 0]
     V = interpU_i[:, :, 1, 0]
     magu = np.sqrt(U * U + V * V)
-    # print grid_i[0, 5, :]- grid_iini[0, 5, :]
     ax1.imshow(uu)
     ax2.imshow(vv)
     ax3.imshow(eigenValues[:,:,0])
