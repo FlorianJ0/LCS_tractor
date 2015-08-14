@@ -17,7 +17,7 @@ from scipy.interpolate import RegularGridInterpolator
 from scipy.interpolate import griddata
 
 from scipy.interpolate import RectBivariateSpline
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 from scipy.integrate import ode
 
@@ -55,7 +55,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     print 'dx', dx
     print 'dy', dy
     print 'dz', dz
-    rr = 2
+    rr = 1
     nnx = nx * rr
     nny = ny * rr
     nnz = nz * rr  # pas de sous divisions sur z
@@ -186,15 +186,17 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         # y0=np.array([0.1,0.1,0.25])
         # print f_u(0,y0)
         print '-----------------------------'
-        t0=0
-        y0=grid_iini[:,50,50,25]
-        print fu(y0[0],y0[1],y0[2], 0.2)
-        print fv(y0[0],y0[1],y0[2], 0.2)
-        print fw(y0[0],y0[1],y0[2], 0.2)
+        # t0=0
+        # y0=grid_iini[:,50,50,25]
+        # print fu(y0[0],y0[1],y0[2], 0.2)
+        # print fv(y0[0],y0[1],y0[2], 0.2)
+        # print fw(y0[0],y0[1],y0[2], 0.2)
         print 'totototot'
-
+        stamp = time.time()
         N = 10
-        t = np.linspace(ttt[1]*dt, (ttt[-1])*dt, N)
+        t = np.linspace(ttt[0]*dt, (ttt[-1])*dt, N)
+        t0 = t[0]
+        t1 = t[-1]
 
         for i in xrange(nnx):
             for j in xrange(nny):
@@ -210,6 +212,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                     k += 1
                 # print 'sol', sol
                 grid_i[:, i, j, zzplan] = sol[-1,:]
+        print 'advection time %f s ' %(time.time()-stamp)
         # print 'y0', y0
         # print 't0', t0
         # print 't',t
@@ -224,8 +227,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
 
 
 
-    quit()
-    # quit()
+
     # gradient of the flow map
     # shadden method
     # (u, v, w) sur (x, y)
@@ -322,7 +324,28 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
             eigvec3[i, j, :] = eigenVectors[i, j, :, np.argmax(eigenValues[i, j, :])]
 
 
+    f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
+    # print didx.shape
+    Y, X = np.mgrid[0:nx * dx:rr * nx * 1j, 0:ny * dy:rr * ny * 1j]
 
+    uu = grid_i[0, :, :]-grid_iini[0,:,:]  # -grid_iini[0,:,:]
+    vv = grid_i[1, :, :]-grid_iini[1,:,:]  # -grid_iini[1,:,:]
+    ww = grid_i[2, :, :]-grid_iini[2,:,:]  # -grid_iini[1,:,:]
+    magx = np.sqrt(uu * uu + vv * vv + ww * ww)
+    U = interpU_i[:, :, 0, 0]
+    V = interpU_i[:, :, 1, 0]
+    magu = np.sqrt(U * U + V * V)
+    # print grid_i[0, 5, :]- grid_iini[0, 5, :]
+    ax1.imshow(uu)
+    ax2.imshow(vv)
+    ax3.imshow(ww)
+    # ax2.imshow(magx)
+    # ax2.imshow(didy)
+    # ax2.imshow(didy)
+    ax4.imshow(magx)
+    # ax3.quiver(X, Y, U, V, color=magu)
+    # ax4.streamplot(X, Y, uu, vv, density=0.6, color='k', linewidth=magx)
+    plt.show()
 
     print '-------------------------'
     print 'error', np.random.random_integers(0, 100)
