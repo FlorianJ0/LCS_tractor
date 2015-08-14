@@ -277,7 +277,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     ax1.imshow(uu)
     ax2.imshow(vv)
     ax3.imshow(ww)
-    ax4.imshow(eigenValues[:,:,0])
+    ax4.imshow(eigenValues[:,:,1])
 
     plt.show()
 
