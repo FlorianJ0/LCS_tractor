@@ -265,13 +265,40 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     #             print i,j, idx,'EIG NOT ORDERED DAMMIT'
     print 'eigvect shape', eigenVectors.shape
     print 'eigval shape', eigenValues.shape
+    eigvec1=np.empty((nnx,nny,3))
+    eigvec3=np.empty((nnx,nny,3))
+    eigval1=np.empty((nnx,nny))
+    eigval3=np.empty((nnx,nny))
 
-    eig_vals_sorted = np.sort(eigenValues)
-    eig_vecs_sorted = eigenVectors[eigenValues.argsort()]
-    eigenValues = eig_vals_sorted
-    eigenVectors = eig_vecs_sorted
-    del eig_vals_sorted
-    del eig_vecs_sorted
+    for i in xrange(eigenValues.shape[0]):
+        for j in xrange(eigenValues.shape[1]):
+            eigval1[i,j] = np.min(eigenValues[i,j,:])
+            eigval3[i,j] = np.max(eigenValues[i,j,:])
+            eigvec1[i,j,:] = eigenVectors[i,j,:,np.argmin(eigenValues[i,j,:])]
+            eigvec3[i,j,:] = eigenVectors[i,j,:,np.argmax(eigenValues[i,j,:])]
+
+
+    #
+    # print eigenValues[25,30,:]
+    # print eigval1[25,30]
+    # print eigval3[25,30]
+    # print '222222222222222222222222222'
+    # print eigenVectors[25,30,:,:]
+    # print eigvec1[25,30,:]
+    # print eigvec3[25,30,:]
+    # print '222222222222222222222222222'
+
+
+    # sort_perm = eigenValues.argsort()
+    #
+    # eigenValues.sort()     # <-- This sorts the list in place.
+    # eigenVectors = eigenVectors[sort_perm]
+
+    # eigenValues = eig_vals_sorted
+    # eigenVectors = eig_vecs_sorted
+    print 'eigenValues shape', eigenValues.shape
+    print 'eigenVec shape', eigenVectors.shape
+
 
     f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
     # print didx.shape
@@ -287,8 +314,8 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     magu = np.sqrt(U * U + V * V)
     ax1.imshow(uu)
     ax2.imshow(vv)
-    ax3.imshow(eigenValues[:,:,0])
-    ax4.imshow(eigenValues[:,:,2])
+    ax3.imshow(eigval1)
+    ax4.imshow(eigval3)
 
     plt.show()
 
@@ -297,4 +324,4 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     print '-------------------------'
     print 'error', np.random.random_integers(0, 100)
     print '-------------------------'
-    return eigenValues,eigenVectors, interpU_i
+    return eigval1, eigval3, eigvec1, eigvec3, interpU_i

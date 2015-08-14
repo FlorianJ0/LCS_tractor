@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 
 def helic(vect, dx, dy, dz):
+    print 'vect shape', vect.shape
     nx = vect.shape[0]
     ny = vect.shape[1]
     dd=np.empty([nx,ny,3])
@@ -18,7 +19,7 @@ def helic(vect, dx, dy, dz):
 
 
 
-def barrier_type(toto, eigval, eigvec, tphys, dt, nx, ny, nz, domain, simtstep):
+def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, tphys, dt, nx, ny, nz, domain, simtstep):
     dx = abs(domain[1] - domain[0]) / nx
     dy = abs(domain[3] - domain[2]) / ny
     dz = abs(domain[5] - domain[4]) / ny
@@ -26,17 +27,17 @@ def barrier_type(toto, eigval, eigvec, tphys, dt, nx, ny, nz, domain, simtstep):
         print 'hyperbolic repelling LCS'
         # cond helicity
         # H = np.dot(eigvec[0],np.cross(np.gradient() ))
-        eigvecm = eigvec[:,:,0,:]
-        print eigvec.shape
-        print eigvecm.shape
-        halp = helic(eigvecm, dx, dy, dz)
+        # eigvecm = eigvec[:,:,0,:]
+        # print eigvec.shape
+        # print eigvecm.shape
+        halp = helic(eigvec3, dx, dy, dz)
         f, ((ax1, ax2)) = plt.subplots(2)
         uu = halp
         # vectU[vectU < -20] = 'NaN'
         # halp[<1e-4]=0
 
         ax1.imshow(np.abs(halp))
-        ax2.imshow(eigval[:,:,3])
+        ax2.imshow(eigval3[:,:])
         plt.show()
         # r = eigenVectors[0]
     elif toto == 1:
