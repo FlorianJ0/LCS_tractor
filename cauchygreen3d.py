@@ -190,37 +190,31 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     dv = IF(axes, dispv)
     dw = IF(axes, dispw)
 
-    print 'efklwfklwnfklawefjkawe'
-    print du(2e-3,2e-3, zzplan*dz+domain[5])
-    d1=dx
-    d2=dy
-    d3=dz
+    d1=dx/2
+    d2=dy/2
+    d3=dz/2
+
         # 3d version haller ann. rev. fluid 2015
     for i in range(1, nnx - 1):
         for j in range(1, nny - 1):
             # for k in range(1, nnz - 1):
             # ACHTUNG CALCUL 3D MAIS SEED 2D
-            # tranche
-            # print grid_i.shape
-            # print (grid_i[0, i + d1, j, tranche] - grid_i[0, i - d1, j, tranche]) / (2*d1)
-            # print (grid_i[0, i + d1, j, tranche] - grid_i[0, i - d1, j, tranche]) / (2*1)
-            i*=dx+domain[0]
-            print 'i', i
-            j*=dy+domain[3]
-            print 'j', j
-            zzzplan=zzplan*dz+domain[5]
-            print 'zplan', zplan
-            dphi[i, j, 0, 0] = (du[0, i + d1, j, zzzplan] - du[0, i - d1, j, zzzplan]) / (2*d1)
-            dphi[i, j, 0, 1] = (du[0, i , j+ d2, zzzplan] - du[0, i, j - d2, zzzplan]) / (2*d2)
-            dphi[i, j, 0, 2] = (du[0, i, j, zzzplan + d3] - du[0, i, j, zzzplan - d3]) / (2*d3)
+            ii=i*dx+domain[0]
+            jj=j*dy+domain[2]
+            zzzplan=zplan*dz+domain[4]
+            # print ii,jj,zzzplan
+            # print
+            dphi[i, j, 0, 0] = (du(ii + d1, jj, zzzplan) - du(ii - d1, jj, zzzplan)) / (2*d1)
+            dphi[i, j, 0, 1] = (du(ii , jj+ d2, zzzplan) - du(ii, jj - d2, zzzplan)) / (2*d2)
+            dphi[i, j, 0, 2] = (du(ii, jj, zzzplan + d3) - du(ii, jj, zzzplan - d3)) / (2*d3)
 
-            dphi[i, j, 1, 0] = (dv[1, i + d1, j, zzzplan] - dv[1, i - d1, j, zzzplan]) / (2*d1)
-            dphi[i, j, 1, 1] = (dv[1, i , j+ d2, zzzplan] - dv[1, i, j - d2, zzzplan]) / (2*d2)
-            dphi[i, j, 1, 2] = (dv[1, i, j, zzzplan + d3] - dv[1, i, j, zzzplan - d3]) / (2*d3)
+            dphi[i, j, 1, 0] = (dv(ii + d1, jj, zzzplan) - dv(ii - d1, jj, zzzplan)) / (2*d1)
+            dphi[i, j, 1, 1] = (dv(ii , jj+ d2, zzzplan) - dv(ii, jj - d2, zzzplan)) / (2*d2)
+            dphi[i, j, 1, 2] = (dv(ii, jj, zzzplan + d3) - dv(ii, jj, zzzplan - d3)) / (2*d3)
 
-            dphi[i, j, 2, 0] = (grid_i[2, i + d1, j, zzzplan] - grid_i[2, i - d1, j, zzzplan]) / (2*d1)
-            dphi[i, j, 2, 1] = (grid_i[2, i , j+ d2, zzzplan] - grid_i[2, i, j - d2, zzzplan]) / (2*d2)
-            dphi[i, j, 2, 2] = (grid_i[2, i, j, zzzplan + d3] - grid_i[2, i, j, zzzplan - d3]) / (2*d3)
+            dphi[i, j, 2, 0] = (dw(ii + d1, jj, zzzplan) - dw(ii - d1, jj, zzzplan)) / (2*d1)
+            dphi[i, j, 2, 1] = (dw(ii , jj+ d2, zzzplan) - dw(ii, jj - d2, zzzplan)) / (2*d2)
+            dphi[i, j, 2, 2] = (dw(ii, jj, zzzplan + d3) - dw(ii, jj, zzzplan - d3)) / (2*d3)
 
 
         # bords a l arrache;
