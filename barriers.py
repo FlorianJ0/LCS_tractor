@@ -33,19 +33,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, tphys, dt, nx, ny, nz
         halp = helic(eigvec3, dx, dy, dz)
         # f, ((ax1, ax2)) = plt.subplots(2)
         uu = halp
-        # vectU[vectU < -20] = 'NaN'
-        # halp[np.abs(halp)<1e-4]=1
-        # halp[np.abs(halp)>1e-4]=0
-        # print halp
-        # ax1.imshow(np.abs(halp))
-        # ax2.imshow(eigval3[:,:])
-        imgplot = plt.imshow(abs(halp))
-        imgplot.set_cmap('hot')
-        # plt.colorbar()
-        # plt.show
-        plt.colorbar()
-        plt.show()
-
+        imgplot = plt.imshow(halp)
         # r = eigenVectors[0]
     elif toto == 1:
         print 'hyperbolic attracting LCS'
