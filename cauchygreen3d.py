@@ -10,13 +10,8 @@ import time
 # from pygsl import spline, errors
 # from pygsl import _numobj as numx
 import scipy.version as ver
-from scipy.interpolate import interp1d
-from scipy.interpolate import interp2d
 from numpy import linalg as LA
-from scipy.interpolate import RegularGridInterpolator
-from scipy.interpolate import griddata
 
-from scipy.interpolate import RectBivariateSpline
 import matplotlib.pyplot as plt
 from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 from scipy.integrate import ode
@@ -193,7 +188,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         # print fw(y0[0],y0[1],y0[2], 0.2)
         print 'totototot'
         stamp = time.time()
-        N = 10
+        N = 50
         t = np.linspace(ttt[0]*dt, (ttt[-1])*dt, N)
         t0 = t[0]
         t1 = t[-1]
@@ -210,9 +205,12 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                     solver.integrate(t[k])
                     sol[k] = solver.y
                     k += 1
-                # print 'sol', sol
                 grid_i[:, i, j, zzplan] = sol[-1,:]
+                # print sol[-1,:]
+                # print grid_i[:, i, j, zzplan]
         print 'advection time %f s ' %(time.time()-stamp)
+
+        # print grid_i[:, :, :, zzplan]
         # print 'y0', y0
         # print 't0', t0
         # print 't',t
@@ -226,111 +224,111 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         print 'rk45'
 
 
+    FTF = True
+    if FTF:
+        # gradient of the flow map
+        # shadden method
+        # (u, v, w) sur (x, y)
+        dphi = np.empty((nnx, nny, 3, 3))
+        # 0,0 0,1 0,2
+        # 1,0 1,1 1,2
+        # 2,0 2,1 2,2
+        xx = np.linspace(domain[0], domain[1], nnx)
+        yy = np.linspace(domain[2], domain[3], nny)
+        zz = np.linspace(domain[4], domain[5], nnz)
+        #
+        dispu = grid_i[0, :, :, :]
+        dispv = grid_i[1, :, :, :]
+        dispw = grid_i[2, :, :, :]
+        #
+        axes = (xx, yy, zz)
+        du = IF(axes, dispu)
+        dv = IF(axes, dispv)
+        dw = IF(axes, dispw)
+
+        d1 = dx / 4
+        d2 = dy / 4
+        d3 = dz / 4
+
+        # 3d version haller ann. rev. fluid 2015
+        for i in range(1, nnx - 1):
+            for j in range(1, nny - 1):
+                # for k in range(1, nnz - 1):
+                # ACHTUNG CALCUL 3D MAIS SEED 2D
+                ii = i * ddx + domain[0]
+                jj = j * ddy + domain[2]
+                zzzplan = zplan * dz + domain[4]
+                # print ii,jj,zzzplan
+                # print
+                # print ii, jj, zzzplan
+
+                dphi[i, j, 0, 0] = (du(ii + d1, jj, zzzplan) - du(ii - d1, jj, zzzplan)) / (2 * d1)
+                dphi[i, j, 0, 1] = (du(ii, jj + d2, zzzplan) - du(ii, jj - d2, zzzplan)) / (2 * d2)
+                dphi[i, j, 0, 2] = (du(ii, jj, zzzplan + d3) - du(ii, jj, zzzplan - d3)) / (2 * d3)
+
+                dphi[i, j, 1, 0] = (dv(ii + d1, jj, zzzplan) - dv(ii - d1, jj, zzzplan)) / (2 * d1)
+                dphi[i, j, 1, 1] = (dv(ii, jj + d2, zzzplan) - dv(ii, jj - d2, zzzplan)) / (2 * d2)
+                dphi[i, j, 1, 2] = (dv(ii, jj, zzzplan + d3) - dv(ii, jj, zzzplan - d3)) / (2 * d3)
+
+                dphi[i, j, 2, 0] = (dw(ii + d1, jj, zzzplan) - dw(ii - d1, jj, zzzplan)) / (2 * d1)
+                dphi[i, j, 2, 1] = (dw(ii, jj + d2, zzzplan) - dw(ii, jj - d2, zzzplan)) / (2 * d2)
+                dphi[i, j, 2, 2] = (dw(ii, jj, zzzplan + d3) - dw(ii, jj, zzzplan - d3)) / (2 * d3)
 
 
-    # gradient of the flow map
-    # shadden method
-    # (u, v, w) sur (x, y)
-    dphi = np.empty((nnx, nny, 3, 3))
-    # 0,0 0,1 0,2
-    # 1,0 1,1 1,2
-    # 2,0 2,1 2,2
-    xx = np.linspace(domain[0], domain[1], nnx)
-    yy = np.linspace(domain[2], domain[3], nny)
-    zz = np.linspace(domain[4], domain[5], nnz)
-    #
-    dispu = grid_i[0, :, :, :]
-    dispv = grid_i[1, :, :, :]
-    dispw = grid_i[2, :, :, :]
-    #
-    axes = (xx, yy, zz)
-    du = IF(axes, dispu)
-    dv = IF(axes, dispv)
-    dw = IF(axes, dispw)
+            # bords a l arrache;
+            dphi[0, :, 0, 0] = dphi[1, :, 0, 0]
+            dphi[nnx - 1, :, 0, 0] = dphi[nnx - 2, :, 0, 0]
+            dphi[:, 0, 0, 0] = dphi[:, 1, 0, 0]
+            dphi[:, nny - 1, 0, 0] = dphi[:, nny - 2, 0, 0]
 
-    d1 = dx / 4
-    d2 = dy / 4
-    d3 = dz / 4
+            dphi[0, :, 0, 1] = dphi[1, :, 0, 1]
+            dphi[nnx - 1, :, 0, 1] = dphi[nnx - 2, :, 0, 1]
+            dphi[:, 0, 0, 1] = dphi[:, 1, 0, 0]
+            dphi[:, nny - 1, 0, 1] = dphi[:, nny - 2, 0, 1]
 
-    # 3d version haller ann. rev. fluid 2015
-    for i in range(1, nnx - 1):
-        for j in range(1, nny - 1):
-            # for k in range(1, nnz - 1):
-            # ACHTUNG CALCUL 3D MAIS SEED 2D
-            ii = i * ddx + domain[0]
-            jj = j * ddy + domain[2]
-            zzzplan = zplan * dz + domain[4]
-            # print ii,jj,zzzplan
-            # print
-            # print ii, jj, zzzplan
+            dphi[0, :, 1, 0] = dphi[1, :, 1, 0]
+            dphi[nnx - 1, :, 1, 0] = dphi[nnx - 2, :, 1, 0]
+            dphi[:, 0, 1, 0] = dphi[:, 1, 1, 0]
+            dphi[:, nny - 1, 1, 0] = dphi[:, nny - 2, 1, 0]
 
-            dphi[i, j, 0, 0] = (du(ii + d1, jj, zzzplan) - du(ii - d1, jj, zzzplan)) / (2 * d1)
-            dphi[i, j, 0, 1] = (du(ii, jj + d2, zzzplan) - du(ii, jj - d2, zzzplan)) / (2 * d2)
-            dphi[i, j, 0, 2] = (du(ii, jj, zzzplan + d3) - du(ii, jj, zzzplan - d3)) / (2 * d3)
+            dphi[0, :, 1, 1] = dphi[1, :, 1, 1]
+            dphi[nnx - 1, :, 1, 1] = dphi[nnx - 2, :, 1, 1]
+            dphi[:, 0, 1, 1] = dphi[:, 1, 1, 1]
+            dphi[:, nny - 1, 1, 1] = dphi[:, nny - 2, 1, 1]
 
-            dphi[i, j, 1, 0] = (dv(ii + d1, jj, zzzplan) - dv(ii - d1, jj, zzzplan)) / (2 * d1)
-            dphi[i, j, 1, 1] = (dv(ii, jj + d2, zzzplan) - dv(ii, jj - d2, zzzplan)) / (2 * d2)
-            dphi[i, j, 1, 2] = (dv(ii, jj, zzzplan + d3) - dv(ii, jj, zzzplan - d3)) / (2 * d3)
+            gdphi = np.empty((nnx, nny, 3, 3))
+            for i in xrange(nnx):
+                for j in xrange(nny):
+                    gdphi[i, j, :, :] = np.dot(dphi[i, j, :, :].T, dphi[i, j, :, :])
 
-            dphi[i, j, 2, 0] = (dw(ii + d1, jj, zzzplan) - dw(ii - d1, jj, zzzplan)) / (2 * d1)
-            dphi[i, j, 2, 1] = (dw(ii, jj + d2, zzzplan) - dw(ii, jj - d2, zzzplan)) / (2 * d2)
-            dphi[i, j, 2, 2] = (dw(ii, jj, zzzplan + d3) - dw(ii, jj, zzzplan - d3)) / (2 * d3)
+        # print dphi.shape, dphi.T.shape,gdphi.shape
+        # toto=np.inner(dphi.T, dphi)
+        # print np.array_equal(gdphi,toto)
+        # print '------------------------'
+
+        eigenValues, eigenVectors = LA.eig(gdphi)
+
+        eigvec1 = np.empty((nnx, nny, 3))
+        eigvec3 = np.empty((nnx, nny, 3))
+        eigval1 = np.empty((nnx, nny))
+        eigval3 = np.empty((nnx, nny))
 
 
-        # bords a l arrache;
-        dphi[0, :, 0, 0] = dphi[1, :, 0, 0]
-        dphi[nnx - 1, :, 0, 0] = dphi[nnx - 2, :, 0, 0]
-        dphi[:, 0, 0, 0] = dphi[:, 1, 0, 0]
-        dphi[:, nny - 1, 0, 0] = dphi[:, nny - 2, 0, 0]
-
-        dphi[0, :, 0, 1] = dphi[1, :, 0, 1]
-        dphi[nnx - 1, :, 0, 1] = dphi[nnx - 2, :, 0, 1]
-        dphi[:, 0, 0, 1] = dphi[:, 1, 0, 0]
-        dphi[:, nny - 1, 0, 1] = dphi[:, nny - 2, 0, 1]
-
-        dphi[0, :, 1, 0] = dphi[1, :, 1, 0]
-        dphi[nnx - 1, :, 1, 0] = dphi[nnx - 2, :, 1, 0]
-        dphi[:, 0, 1, 0] = dphi[:, 1, 1, 0]
-        dphi[:, nny - 1, 1, 0] = dphi[:, nny - 2, 1, 0]
-
-        dphi[0, :, 1, 1] = dphi[1, :, 1, 1]
-        dphi[nnx - 1, :, 1, 1] = dphi[nnx - 2, :, 1, 1]
-        dphi[:, 0, 1, 1] = dphi[:, 1, 1, 1]
-        dphi[:, nny - 1, 1, 1] = dphi[:, nny - 2, 1, 1]
-
-        gdphi = np.empty((nnx, nny, 3, 3))
-        for i in xrange(nnx):
-            for j in xrange(nny):
-                gdphi[i, j, :, :] = np.dot(dphi[i, j, :, :].T, dphi[i, j, :, :])
-
-    # print dphi.shape, dphi.T.shape,gdphi.shape
-    # toto=np.inner(dphi.T, dphi)
-    # print np.array_equal(gdphi,toto)
-    # print '------------------------'
-
-    eigenValues, eigenVectors = LA.eig(gdphi)
-
-    eigvec1 = np.empty((nnx, nny, 3))
-    eigvec3 = np.empty((nnx, nny, 3))
-    eigval1 = np.empty((nnx, nny))
-    eigval3 = np.empty((nnx, nny))
-
-
-    for i in xrange(eigenValues.shape[0]):
-        for j in xrange(eigenValues.shape[1]):
-            eigval1[i, j] = np.min(eigenValues[i, j, :])
-            eigval3[i, j] = np.max(eigenValues[i, j, :])
-            eigvec1[i, j, :] = eigenVectors[i, j, :, np.argmin(eigenValues[i, j, :])]
-            eigvec3[i, j, :] = eigenVectors[i, j, :, np.argmax(eigenValues[i, j, :])]
+        for i in xrange(eigenValues.shape[0]):
+            for j in xrange(eigenValues.shape[1]):
+                eigval1[i, j] = np.min(eigenValues[i, j, :])
+                eigval3[i, j] = np.max(eigenValues[i, j, :])
+                eigvec1[i, j, :] = eigenVectors[i, j, :, np.argmin(eigenValues[i, j, :])]
+                eigvec3[i, j, :] = eigenVectors[i, j, :, np.argmax(eigenValues[i, j, :])]
 
 
     f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
     # print didx.shape
     Y, X = np.mgrid[0:nx * dx:rr * nx * 1j, 0:ny * dy:rr * ny * 1j]
 
-    uu = grid_i[0, :, :]-grid_iini[0,:,:]  # -grid_iini[0,:,:]
-    vv = grid_i[1, :, :]-grid_iini[1,:,:]  # -grid_iini[1,:,:]
-    ww = grid_i[2, :, :]-grid_iini[2,:,:]  # -grid_iini[1,:,:]
+    uu = grid_i[0, :, :,zzplan]-grid_iini[0,:,:,zzplan]  # -grid_iini[0,:,:]
+    vv = grid_i[1, :, :,zzplan]-grid_iini[1,:,:,zzplan]  # -grid_iini[1,:,:]
+    ww = grid_i[2, :, :,zzplan]-grid_iini[2,:,:,zzplan]  # -grid_iini[1,:,:]
     magx = np.sqrt(uu * uu + vv * vv + ww * ww)
     U = interpU_i[:, :, 0, 0]
     V = interpU_i[:, :, 1, 0]
