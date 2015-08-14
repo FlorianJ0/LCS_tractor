@@ -55,7 +55,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     print 'dx', dx
     print 'dy', dy
     print 'dz', dz
-    rr = 1
+    rr = 2
     nnx = nx * rr
     nny = ny * rr
     nnz = nz * rr# pas de sous divisions sur z
@@ -190,20 +190,22 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     dv = IF(axes, dispv)
     dw = IF(axes, dispw)
 
-    d1=dx/2
-    d2=dy/2
-    d3=dz/2
+    d1=dx/4
+    d2=dy/4
+    d3=dz/4
 
         # 3d version haller ann. rev. fluid 2015
     for i in range(1, nnx - 1):
         for j in range(1, nny - 1):
             # for k in range(1, nnz - 1):
             # ACHTUNG CALCUL 3D MAIS SEED 2D
-            ii=i*dx+domain[0]
-            jj=j*dy+domain[2]
+            ii=i*ddx+domain[0]
+            jj=j*ddy+domain[2]
             zzzplan=zplan*dz+domain[4]
             # print ii,jj,zzzplan
             # print
+            # print ii, jj, zzzplan
+
             dphi[i, j, 0, 0] = (du(ii + d1, jj, zzzplan) - du(ii - d1, jj, zzzplan)) / (2*d1)
             dphi[i, j, 0, 1] = (du(ii , jj+ d2, zzzplan) - du(ii, jj - d2, zzzplan)) / (2*d2)
             dphi[i, j, 0, 2] = (du(ii, jj, zzzplan + d3) - du(ii, jj, zzzplan - d3)) / (2*d3)
@@ -300,24 +302,24 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     print 'eigenVec shape', eigenVectors.shape
 
 
-    f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
-    # print didx.shape
-    # Y, X = np.mgrid[0:nx * dx:rr * nx * 1j, 0:ny * dy:rr * ny * 1j]
-
-    uu = grid_i[0, :, :, zzplan]-grid_iini[0,:,:, zzplan]  # -grid_iini[0,:,:]
-    vv = grid_i[1, :, :, zzplan]-grid_iini[1,:,:, zzplan]  # -grid_iini[1,:,:]
-    ww = grid_i[2, :, :, zzplan]-grid_iini[2,:,:, zzplan]  # -grid_iini[1,:,:]
-
-    magx = np.sqrt(uu * uu + vv * vv + ww * ww)
-    U = interpU_i[:, :, 0, 0]
-    V = interpU_i[:, :, 1, 0]
-    magu = np.sqrt(U * U + V * V)
-    ax1.imshow(uu)
-    ax2.imshow(vv)
-    ax3.imshow(eigval1)
-    ax4.imshow(eigval3)
-
-    plt.show()
+    # f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
+    # # print didx.shape
+    # # Y, X = np.mgrid[0:nx * dx:rr * nx * 1j, 0:ny * dy:rr * ny * 1j]
+    #
+    # uu = grid_i[0, :, :, zzplan]-grid_iini[0,:,:, zzplan]  # -grid_iini[0,:,:]
+    # vv = grid_i[1, :, :, zzplan]-grid_iini[1,:,:, zzplan]  # -grid_iini[1,:,:]
+    # ww = grid_i[2, :, :, zzplan]-grid_iini[2,:,:, zzplan]  # -grid_iini[1,:,:]
+    #
+    # magx = np.sqrt(uu * uu + vv * vv + ww * ww)
+    # U = interpU_i[:, :, 0, 0]
+    # V = interpU_i[:, :, 1, 0]
+    # magu = np.sqrt(U * U + V * V)
+    # ax1.imshow(uu)
+    # ax2.imshow(vv)
+    # ax3.imshow(eigval1)
+    # ax4.imshow(eigval3)
+    #
+    # plt.show()
 
 
 
