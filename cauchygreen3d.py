@@ -55,7 +55,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     print 'dx', dx
     print 'dy', dy
     print 'dz', dz
-    rr = 2
+    rr = 1
     nnx = nx * rr
     nny = ny * rr
     nnz = nz * rr# pas de sous divisions sur z
@@ -191,9 +191,11 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     dw = IF(axes, dispw)
 
     print 'grid_i(0, 0.1,0.1,0.25)'
-    print grid_i[0, 50,50,50]
+    # print grid_i[0, 50,50,50]
     print 'du(0.1,0.1,0.25)'
-    print du(0.1,0.1,0.25)
+    # print du(0.1,0.1,0.25)
+    print grid_i.shape, axes[0].shape
+    print 'tototototot'
     d1=dx
     d2=dy
     d3=dz
