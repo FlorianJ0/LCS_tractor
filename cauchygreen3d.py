@@ -191,7 +191,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     dw = IF(axes, dispw)
 
     print 'efklwfklwnfklawefjkawe'
-    print du(2e-3,2e-3)
+    print du(2e-3,2e-3, zzplan*dz+domain[5])
     d1=dx
     d2=dy
     d3=dz
