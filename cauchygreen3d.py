@@ -188,7 +188,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         # print fw(y0[0],y0[1],y0[2], 0.2)
         print 'totototot'
         stamp = time.time()
-        N = 50
+        N = 5
         t = np.linspace(ttt[0]*dt, (ttt[-1])*dt, N)
         t0 = t[0]
         t1 = t[-1]
@@ -206,7 +206,9 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                     sol[k] = solver.y
                     k += 1
                 grid_i[:, i, j, zzplan] = sol[-1,:]
-                # print sol[-1,:]
+                print sol[0,:]
+                print sol[-1,:]
+                print 'tototo'
                 # print grid_i[:, i, j, zzplan]
         print 'advection time %f s ' %(time.time()-stamp)
 
