@@ -17,7 +17,7 @@ from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 # from scipy.interpolate import RegularGridInterpolator as IF
 from scipy.integrate import ode
 from scipy.interpolate import griddata
-
+import inpolator
 
 # import vtk
 # from vtk import *
@@ -126,6 +126,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         print 'scipy version %s is high, so am I' % ver.full_version
 
 
+    inpolator.interp(nx,ny,nz,velp,0,0)
     # interp tranche par tranche, parceque c'est ce qui  nous interesse dumbass
     # print domain
     # print nx, ny, nz, nnx, nny, nnz
