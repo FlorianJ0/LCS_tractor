@@ -10,7 +10,7 @@ def helic(vect, dx, dy, dz):
     ny = vect.shape[1]
     dd=np.empty([nx,ny,3])
     ddd=np.empty([nx,ny])
-    eps0 = 1e-3
+    eps0 = 1e-2
     # at each point, 3d grad vector of 3D eigenc
     for i in xrange(nx):
         for j in xrange(ny):

@@ -16,6 +16,10 @@ def read_files(loc):
     :rtype : vector
     """
     dircont = sorted(glob.glob(loc + '/*.vtk'))
+    if len(dircont) == 0:
+        print 'po de fichiers'
+        print 'con'
+        quit()
     count = 0
     for i in dircont:
         reader = vtkRectilinearGridReader()

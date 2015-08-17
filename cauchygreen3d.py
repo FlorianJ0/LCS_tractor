@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 # from scipy.interpolate import RegularGridInterpolator as IF
 from scipy.integrate import ode
+from scipy.interpolate import griddata
+
 
 # import vtk
 # from vtk import *
@@ -132,6 +134,17 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     x = np.linspace(domain[0], domain[1], nx)
     y = np.linspace(domain[2], domain[3], ny)
     z = np.linspace(domain[4], domain[5], nz)
+    velpu = velp[:, :, :, 0, :]
+    velpv = velp[:, :, :, 1, :]
+    velpw = velp[:, :, :, 2, :]
+
+
+
+
+
+    # print pts
+    # for t in ttt:
+        # vals = np.array([velpu[:,0,0,0,t],velp[:,0,0,0,t],velp[1]]).swapaxes(1,0)
     # t = ttt
     # print z, 'nfABDASdbashjkdb'
     # print 'nz', nz, domain[4],domain[5]
@@ -139,9 +152,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     # y_i = np.linspace(domain[2],domain[3], nny)
     # z_i = np.linspace(domain[4],domain[5], nnz)
 
-    velpu = velp[:, :, :, 0, :]
-    velpv = velp[:, :, :, 1, :]
-    velpw = velp[:, :, :, 2, :]
+
 
     axes = (x, y, z, ttt)
     fu = IF(axes, velpu)
@@ -178,6 +189,9 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         def f_u(t, y):
             return np.array([fu(y[0],y[1],y[2], t),fv(y[0],y[1],y[2], t),fw(y[0],y[1],y[2], t)])
 
+        #
+        # print velp[25,25,20,0,0]
+        # print fu(25*ddx,25*ddy,20*ddz,1*dt)
 
         # r = odeint(f_u).set_integrator('dopri5')
         solver = ode(f_u)
@@ -252,9 +266,9 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         dv = IF(axes, dispv)
         dw = IF(axes, dispw)
 
-        d1 = dx / 2
-        d2 = dy / 2
-        d3 = dz / 2
+        d1 = dx / 3
+        d2 = dy / 3
+        d3 = dz / 3
 
         # 3d version haller ann. rev. fluid 2015
         for i in range(1, nnx - 1):
@@ -335,28 +349,28 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                 eigvec3[i, j, :] = eigenVectors[i, j, :, np.argmax(eigenValues[i, j, :])]
 
 
-    # f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
-    # # print didx.shape
-    # Y, X = np.mgrid[0:nx * dx:rr * nx * 1j, 0:ny * dy:rr * ny * 1j]
-    #
-    # uu = grid_i[0, :, :,zzplan]-grid_iini[0,:,:,zzplan]  # -grid_iini[0,:,:]
-    # vv = grid_i[1, :, :,zzplan]-grid_iini[1,:,:,zzplan]  # -grid_iini[1,:,:]
-    # ww = grid_i[2, :, :,zzplan]-grid_iini[2,:,:,zzplan]  # -grid_iini[1,:,:]
-    # magx = np.sqrt(uu * uu + vv * vv + ww * ww)
-    # U = interpU_i[:, :, 0, 0]
-    # V = interpU_i[:, :, 1, 0]
-    # magu = np.sqrt(U * U + V * V)
-    # # print grid_i[0, 5, :]- grid_iini[0, 5, :]
-    # ax1.imshow(uu)
-    # ax2.imshow(vv)
-    # ax3.imshow(ww)
-    # # ax2.imshow(magx)
-    # # ax2.imshow(didy)
-    # # ax2.imshow(didy)
-    # ax4.imshow(magx)
-    # # ax3.quiver(X, Y, U, V, color=magu)
-    # # ax4.streamplot(X, Y, uu, vv, density=0.6, color='k', linewidth=magx)
-    # plt.show()
+    f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
+    # print didx.shape
+    Y, X = np.mgrid[0:nx * dx:rr * nx * 1j, 0:ny * dy:rr * ny * 1j]
+
+    uu = grid_i[0, :, :,zzplan]-grid_iini[0,:,:,zzplan]  # -grid_iini[0,:,:]
+    vv = grid_i[1, :, :,zzplan]-grid_iini[1,:,:,zzplan]  # -grid_iini[1,:,:]
+    ww = grid_i[2, :, :,zzplan]-grid_iini[2,:,:,zzplan]  # -grid_iini[1,:,:]
+    magx = np.sqrt(uu * uu + vv * vv + ww * ww)
+    U = interpU_i[:, :, 0, 0]
+    V = interpU_i[:, :, 1, 0]
+    magu = np.sqrt(U * U + V * V)
+    # print grid_i[0, 5, :]- grid_iini[0, 5, :]
+    ax1.imshow(uu)
+    ax2.imshow(vv)
+    ax3.imshow(eigval1)
+    # ax2.imshow(magx)
+    # ax2.imshow(didy)
+    # ax2.imshow(didy)
+    ax4.imshow(eigval3)
+    # ax3.quiver(X, Y, U, V, color=magu)
+    # ax4.streamplot(X, Y, uu, vv, density=0.6, color='k', linewidth=magx)
+    plt.show()
 
     print '-------------------------'
     print 'error', np.random.random_integers(0, 100)
