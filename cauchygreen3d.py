@@ -27,6 +27,8 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     ttt = np.arange(ttt)
 
     n = len(ttt)
+    N = 15 #rk45 int step
+
     tranche = zplan  # index de la tranche evaluee
     velp = np.empty((nx, ny, nz, dim, n))
     # velp[x,y,(i,j,k), t]
@@ -177,7 +179,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
 
         # r = odeint(f_u).set_integrator('dopri5')
         solver = ode(f_u)
-        solver.set_integrator('dopri5')
+        solver.set_integrator('lsoda')
         # t1=ttt[-1]*dt
         # y0=np.array([0.1,0.1,0.25])
         # print f_u(0,y0)
@@ -189,7 +191,6 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         # print fw(y0[0],y0[1],y0[2], 0.2)
         print 'totototot'
         stamp = time.time()
-        N = 5
         t = np.linspace(ttt[0]*dt, (ttt[-1])*dt, N)
         t0 = t[0]
         t1 = t[-1]
@@ -325,28 +326,28 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                 eigvec3[i, j, :] = eigenVectors[i, j, :, np.argmax(eigenValues[i, j, :])]
 
 
-    f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
-    # print didx.shape
-    Y, X = np.mgrid[0:nx * dx:rr * nx * 1j, 0:ny * dy:rr * ny * 1j]
-
-    uu = grid_i[0, :, :,zzplan]-grid_iini[0,:,:,zzplan]  # -grid_iini[0,:,:]
-    vv = grid_i[1, :, :,zzplan]-grid_iini[1,:,:,zzplan]  # -grid_iini[1,:,:]
-    ww = grid_i[2, :, :,zzplan]-grid_iini[2,:,:,zzplan]  # -grid_iini[1,:,:]
-    magx = np.sqrt(uu * uu + vv * vv + ww * ww)
-    U = interpU_i[:, :, 0, 0]
-    V = interpU_i[:, :, 1, 0]
-    magu = np.sqrt(U * U + V * V)
-    # print grid_i[0, 5, :]- grid_iini[0, 5, :]
-    ax1.imshow(uu)
-    ax2.imshow(vv)
-    ax3.imshow(ww)
-    # ax2.imshow(magx)
-    # ax2.imshow(didy)
-    # ax2.imshow(didy)
-    ax4.imshow(magx)
-    # ax3.quiver(X, Y, U, V, color=magu)
-    # ax4.streamplot(X, Y, uu, vv, density=0.6, color='k', linewidth=magx)
-    plt.show()
+    # f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
+    # # print didx.shape
+    # Y, X = np.mgrid[0:nx * dx:rr * nx * 1j, 0:ny * dy:rr * ny * 1j]
+    #
+    # uu = grid_i[0, :, :,zzplan]-grid_iini[0,:,:,zzplan]  # -grid_iini[0,:,:]
+    # vv = grid_i[1, :, :,zzplan]-grid_iini[1,:,:,zzplan]  # -grid_iini[1,:,:]
+    # ww = grid_i[2, :, :,zzplan]-grid_iini[2,:,:,zzplan]  # -grid_iini[1,:,:]
+    # magx = np.sqrt(uu * uu + vv * vv + ww * ww)
+    # U = interpU_i[:, :, 0, 0]
+    # V = interpU_i[:, :, 1, 0]
+    # magu = np.sqrt(U * U + V * V)
+    # # print grid_i[0, 5, :]- grid_iini[0, 5, :]
+    # ax1.imshow(uu)
+    # ax2.imshow(vv)
+    # ax3.imshow(ww)
+    # # ax2.imshow(magx)
+    # # ax2.imshow(didy)
+    # # ax2.imshow(didy)
+    # ax4.imshow(magx)
+    # # ax3.quiver(X, Y, U, V, color=magu)
+    # # ax4.streamplot(X, Y, uu, vv, density=0.6, color='k', linewidth=magx)
+    # plt.show()
 
     print '-------------------------'
     print 'error', np.random.random_integers(0, 100)
