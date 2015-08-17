@@ -28,6 +28,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
 
     n = len(ttt)
     N = 15 #rk45 int step
+    integrator = 'vode'#ou dopri5 pour du dormant-prince rk45a-
 
     tranche = zplan  # index de la tranche evaluee
     velp = np.empty((nx, ny, nz, dim, n))
@@ -179,7 +180,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
 
         # r = odeint(f_u).set_integrator('dopri5')
         solver = ode(f_u)
-        solver.set_integrator('lsoda')
+        solver.set_integrator(integrator)
         # t1=ttt[-1]*dt
         # y0=np.array([0.1,0.1,0.25])
         # print f_u(0,y0)

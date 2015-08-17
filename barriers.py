@@ -10,19 +10,31 @@ def helic(vect, dx, dy, dz):
     ny = vect.shape[1]
     dd=np.empty([nx,ny,3])
     ddd=np.empty([nx,ny])
+    eps0 = 1e-3
     # at each point, 3d grad vector of 3D eigenc
-    toto=0
     for i in xrange(nx):
         for j in xrange(ny):
             dd[i,j,:]=np.gradient(vect[i,j,:])
             ddd[i,j]=np.dot(vect[i,j,:],dd[i,j,:])
-            if ddd[i,j]<1e-3:
-                toto+=1
-    print 'toto', toto
-
+            # if abs(ddd[i,j])<eps0:
+            #     ddd[i,j]=True
+            # else
+            #     ddd[i,j]=False
+    a = abs(ddd)<eps0
+    ddd *= a
 
     return ddd
 
+def reduced_lines(vect, dx, dy, dz, initpts):
+    print 'integrate reduced LCSs'
+    #on suppose qu on est toujours normal  a z
+    # norm vect = 0 0 -1
+    # donc n vectproduct k = kj -ki 0
+    # la trajectoire est portee par le vect kj -ki 0 donc dans le plan
+    def func:
+
+
+    return redc
 
 
 def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, tphys, dt, nx, ny, nz, domain, simtstep):
@@ -36,7 +48,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, tphys, dt, nx, ny, nz
         # eigvecm = eigvec[:,:,0,:]
         # print eigvec.shape
         # print eigvecm.shape
-        halp = helic(eigvec3, dx, dy, dz)
+        initpts = helic(eigvec3, dx, dy, dz)
         # f, ((ax1, ax2)) = plt.subplots(2)
         uu = halp
         # imgplot = plt.imshow(halp)
@@ -44,7 +56,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, tphys, dt, nx, ny, nz
         ax1.imshow(np.abs(uu))
         ax2.imshow(uu)
         plt.show()
-
+        reduced_lines(eigvec3, dx, dy, dz, initpts)
         # r = eigenVectors[0]
     elif toto == 1:
         print 'hyperbolic attracting LCS'
