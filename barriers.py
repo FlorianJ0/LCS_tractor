@@ -31,13 +31,9 @@ def reduced_lines(vect, dx, dy, dz, initpts):
     # norm vect = 0 0 -1
     # donc n vectproduct k = kj -ki 0
     # la trajectoire est portee par le vect kj -ki 0 donc dans le plan
-    def func:
-        """
+    # def func:
 
-        :rtype : object
-        """
-
-    return redc
+    return
 
 
 def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, tphys, dt, nx, ny, nz, domain, simtstep):
@@ -53,7 +49,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, tphys, dt, nx, ny, nz
         # print eigvecm.shape
         initpts = helic(eigvec3, dx, dy, dz)
         # f, ((ax1, ax2)) = plt.subplots(2)
-        uu = halp
+        uu = initpts
         # imgplot = plt.imshow(halp)
         f, (ax1, ax2) = plt.subplots(2, 1)
         ax1.imshow(np.abs(uu))

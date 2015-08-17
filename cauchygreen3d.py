@@ -27,7 +27,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     ttt = np.arange(ttt)
 
     n = len(ttt)
-    N = 15 #rk45 int step
+    N = 15   #rk45 int step
     integrator = 'vode'#ou dopri5 pour du dormant-prince rk45a-
 
     tranche = zplan  # index de la tranche evaluee
@@ -55,6 +55,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     print 'dy', dy
     print 'dz', dz
     rr = 1
+
     nnx = nx * rr
     nny = ny * rr
     nnz = nz * rr  # pas de sous divisions sur z
@@ -251,9 +252,9 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         dv = IF(axes, dispv)
         dw = IF(axes, dispw)
 
-        d1 = dx / 4
-        d2 = dy / 4
-        d3 = dz / 4
+        d1 = dx / 2
+        d2 = dy / 2
+        d3 = dz / 2
 
         # 3d version haller ann. rev. fluid 2015
         for i in range(1, nnx - 1):
@@ -318,6 +319,13 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         eigval1 = np.empty((nnx, nny))
         eigval3 = np.empty((nnx, nny))
 
+        print 'min,max,avg,stdev'
+        a = eigenValues[:,:,0]*eigenValues[:,:,1]*eigenValues[:,:,2]
+        print np.min(a)
+        print np.max(a)
+        print np.average(a)
+        print np.std(a)
+        print '{{{{{{'
 
         for i in xrange(eigenValues.shape[0]):
             for j in xrange(eigenValues.shape[1]):
