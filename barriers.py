@@ -32,7 +32,10 @@ def reduced_lines(vect, dx, dy, dz, initpts):
     # donc n vectproduct k = kj -ki 0
     # la trajectoire est portee par le vect kj -ki 0 donc dans le plan
     def func:
+        """
 
+        :rtype : object
+        """
 
     return redc
 
