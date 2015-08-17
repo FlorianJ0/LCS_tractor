@@ -6,7 +6,7 @@ from scipy import *
 # from vtk.util import numpy_support as vn
 # import pygsl._numobj as numx
 import time
-# from pygsl import odeiv
+from pygsl import odeiv
 # from pygsl import spline, errors
 # from pygsl import _numobj as numx
 import scipy.version as ver
@@ -14,6 +14,7 @@ from numpy import linalg as LA
 
 import matplotlib.pyplot as plt
 from Scientific.Functions.Interpolation import InterpolatingFunction as IF
+# from scipy.interpolate import RegularGridInterpolator as IF
 from scipy.integrate import ode
 
 # import vtk
@@ -177,7 +178,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         # r = odeint(f_u).set_integrator('dopri5')
         solver = ode(f_u)
         solver.set_integrator('dopri5')
-        t1=ttt[-1]*dt
+        # t1=ttt[-1]*dt
         # y0=np.array([0.1,0.1,0.25])
         # print f_u(0,y0)
         print '-----------------------------'
@@ -206,9 +207,9 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                     sol[k] = solver.y
                     k += 1
                 grid_i[:, i, j, zzplan] = sol[-1,:]
-                print sol[0,:]
-                print sol[-1,:]
-                print 'tototo'
+                # print sol[0,:]
+                # print sol[-1,:]
+                # print 'tototo'
                 # print grid_i[:, i, j, zzplan]
         print 'advection time %f s ' %(time.time()-stamp)
 
