@@ -1,10 +1,8 @@
-__author__ = 'p0054421'
-#source:https://github.com/JohannesBuchner/regulargrid/blob/master/regulargrid/interpn.py
 from scipy.interpolate import interp1d
 from numpy import interp
 
 def interpn(*args, **kw):
-	"""Interpolation on N-D.
+	"""Interpolation on N-D. 
 	ai = interpn(x, y, z, ..., a, xi, yi, zi, ...)
 	where the arrays x, y, z, ... define a rectangular grid
 	and a.shape == (len(x), len(y), len(z), ...) are the values
@@ -14,18 +12,21 @@ def interpn(*args, **kw):
 	if kw:
 		raise ValueError("Unknown arguments: " % kw.keys())
 	nd = (len(args)-1)//2
+	print 'nd', nd
 	if len(args) != 2*nd+1:
 		raise ValueError("Wrong number of arguments")
 	q = args[:nd]
 	qi = args[nd+1:]
 	a = args[nd]
 	for j in range(nd):
+		print j
 		#print q[j].shape, a.shape
 		a = interp1d(q[j], a, axis=j, kind=method)(qi[j])
+		print 'ok'
 	return a
 
 def npinterpn(*args, **kw):
-	"""Interpolation on N-D.
+	"""Interpolation on N-D. 
 	ai = interpn(x, y, z, ..., a, xi, yi, zi, ...)
 	where the arrays x, y, z, ... define a rectangular grid
 	and a.shape == (len(x), len(y), len(z), ...) are the values

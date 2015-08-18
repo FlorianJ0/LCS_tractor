@@ -10,6 +10,8 @@ import cauchygreen
 import barriers
 import cauchygreen3d
 import gyronator
+import readUvtk_unstructured
+import numpy as np
 # vitesse min pour savoir si on est in/out domain (a mettre a -100 pour la suite)
 outofdomain = 1E-16
 instat = True
@@ -17,9 +19,24 @@ instat = True
 simtstep = 0.04
 # read file/s
 loc = '/home/p0054421/MEGA/calcul/LCS_tractor/data'
-vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk.read_files(loc)
-# vel, nx, ny, nz, dim_initial, tphys, dt, domain = gyronator.gyro()
+
+
+unstruct = True
+if unstruct:
+    loc = '/media/backup/patients_article0/patient4/DOIRE^JEAN-LOUIS/DOIRE^JEAN_LOUIS_20060124/Simulation/VTK/'
+    extend=np.array([0.05,0.15,0.04,0.14,0.2,0.3])
+    dim=np.array([50,50,50])
+    vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk_unstructured.read_files(loc, dim, extend)
+elif struct:
+    vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk.read_files(loc)
+elif anal:
+    vel, nx, ny, nz, dim_initial, tphys, dt, domain = gyronator.gyro()
+else:
+    print 'wut ?'
+    quit()
+
 print 'Velocity read'
+quit()
 
 """
 -sur [t0, t0+T] et n grilles G0 de PI 2D uniformes recti sur z (parceque ca m'arrange)
@@ -36,8 +53,8 @@ z = 25.
 # t = 3
 # calcul sur un plan x y parceque jsuis trop une feignasse pour un code generique
 dim = 2
-# eigval1, eigval3, eigvec1, eigvec3, interpU_i = cauchygreen3d.cgstki3(vel, z, tphys, dt, nx, ny, nz, 3, domain, simtstep)
-eigval1, eigval3, eigvec1, eigvec3, interpU_i = cauchygreen3d.cgstki3(vel, z, tphys, dt, nx, ny, nz, 3, domain, simtstep)
 
+
+eigval1, eigval3, eigvec1, eigvec3, interpU_i = cauchygreen3d.cgstki3(vel, z, tphys, dt, nx, ny, nz, 3, domain, simtstep)
 barriers.barrier_type(0, eigval1, eigval3, eigvec1, eigvec3, tphys, dt, nx, ny, nz, domain, simtstep)
 # barriers.barrier_type(0, eigval, eigvec, tphys, dt, nx, ny, domain, simtstep)

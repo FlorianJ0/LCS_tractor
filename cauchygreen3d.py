@@ -18,6 +18,7 @@ from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 from scipy.integrate import ode
 from scipy.interpolate import griddata
 import inpolator
+from scipy.ndimage.filters import gaussian_filter
 
 # import vtk
 # from vtk import *
@@ -45,6 +46,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     print 'vel shape'
     print vel.shape
     velp = vel
+    velp= gaussian_filter(velp, 0.5)
     # print velp[25,25,:,:]
 
     ptlist = np.indices((nx, ny, nz))
@@ -126,7 +128,9 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         print 'scipy version %s is high, so am I' % ver.full_version
 
 
-    inpolator.interp(nx,ny,nz,velp,0,0)
+    # inpolator.interp(nx,ny,nz,velp,0,0, rr)
+    # print velp[:,:,:,0,0].shape
+    # quit()
     # interp tranche par tranche, parceque c'est ce qui  nous interesse dumbass
     # print domain
     # print nx, ny, nz, nnx, nny, nnz
