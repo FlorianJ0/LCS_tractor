@@ -20,11 +20,14 @@ Boost_DIR:PATH=Boost_DIR-NOTFOUND
 //Path to a file.
 Boost_INCLUDE_DIR:PATH=/usr/include
 
+//Boost library directory
+Boost_LIBRARY_DIR:PATH=/usr/lib/x86_64-linux-gnu
+
 //Boost python library (debug)
-Boost_PYTHON_LIBRARY_DEBUG:FILEPATH=Boost_PYTHON_LIBRARY_DEBUG-NOTFOUND
+Boost_PYTHON_LIBRARY_DEBUG:FILEPATH=/usr/lib/x86_64-linux-gnu/libboost_python.so
 
 //Boost python library (release)
-Boost_PYTHON_LIBRARY_RELEASE:FILEPATH=Boost_PYTHON_LIBRARY_RELEASE-NOTFOUND
+Boost_PYTHON_LIBRARY_RELEASE:FILEPATH=/usr/lib/x86_64-linux-gnu/libboost_python.so
 
 //Path to a program.
 CMAKE_AR:FILEPATH=/usr/bin/ar
@@ -209,8 +212,8 @@ Project_BINARY_DIR:STATIC=/home/p0054421/MEGA/calcul/LCS_tractor/pytricubic-mast
 //Value Computed by CMake
 Project_SOURCE_DIR:STATIC=/home/p0054421/MEGA/calcul/LCS_tractor/pytricubic-master
 
-//Dependencies for target
-tricubic_LIB_DEPENDS:STATIC=
+//Dependencies for the target
+tricubic_LIB_DEPENDS:STATIC=general;/usr/lib/x86_64-linux-gnu/libboost_python.so;general;-lpython2.7;general;-lboost_python;
 
 
 ########################
@@ -221,6 +224,8 @@ tricubic_LIB_DEPENDS:STATIC=
 Boost_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Boost_INCLUDE_DIR
 Boost_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_LIBRARY_DIR
+Boost_LIBRARY_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Boost_PYTHON_LIBRARY_DEBUG
 Boost_PYTHON_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Boost_PYTHON_LIBRARY_RELEASE
@@ -376,6 +381,8 @@ PYTHON_MODULE_tricubic_BUILD_SHARED-ADVANCED:INTERNAL=1
 _Boost_COMPONENTS_SEARCHED:INTERNAL=python
 //Last used Boost_INCLUDE_DIR value.
 _Boost_INCLUDE_DIR_LAST:INTERNAL=/usr/include
+//Last used Boost_LIBRARY_DIR value.
+_Boost_LIBRARY_DIR_LAST:INTERNAL=/usr/lib/x86_64-linux-gnu
 //Last used Boost_USE_MULTITHREADED value.
 _Boost_USE_MULTITHREADED_LAST:INTERNAL=TRUE
 

@@ -84,6 +84,7 @@ tricubic_EXTERNAL_OBJECTS =
 
 tricubic.so: CMakeFiles/tricubic.dir/tricubic.cpp.o
 tricubic.so: CMakeFiles/tricubic.dir/build.make
+tricubic.so: /usr/lib/x86_64-linux-gnu/libboost_python.so
 tricubic.so: CMakeFiles/tricubic.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX shared module tricubic.so"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/tricubic.dir/link.txt --verbose=$(VERBOSE)

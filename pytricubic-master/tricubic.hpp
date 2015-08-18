@@ -1,9 +1,12 @@
 #include <string>
 #include <sstream>
+#include <iomanip>
 #include <Eigen/Dense>
+#include <boost/version.hpp>
 #include <boost/array.hpp>
 #include <boost/multi_array.hpp>
 #include <boost/python.hpp>
+#include <Python.h>
 
 using namespace boost::python;
 typedef float fptype;
@@ -24,6 +27,7 @@ class TriCubicInterpolator{
     int _n1, _n2, _n3;
     int _i1, _i2, _i3;
     bool _initialized;
+
     Eigen::Matrix<fptype,64,1> _coefs;
     Eigen::Matrix<fptype,64,64> _C;
     inline int _index(int i1, int i2, int i3) const {

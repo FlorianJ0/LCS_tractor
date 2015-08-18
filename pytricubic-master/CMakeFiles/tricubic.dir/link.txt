@@ -1,1 +1,1 @@
-/usr/bin/c++  -fPIC -O3 -march=native    -shared -Wl,-soname,tricubic.so -o tricubic.so CMakeFiles/tricubic.dir/tricubic.cpp.o 
+/usr/bin/c++  -fPIC -O3 -march=native    -shared -Wl,-soname,tricubic.so -o tricubic.so CMakeFiles/tricubic.dir/tricubic.cpp.o -lboost_python -lpython2.7 -lboost_python 

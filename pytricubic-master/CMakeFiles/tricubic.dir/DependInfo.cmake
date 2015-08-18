@@ -14,6 +14,7 @@ SET(CMAKE_TARGET_LINKED_INFO_FILES
 
 # The include file search paths:
 SET(CMAKE_C_TARGET_INCLUDE_PATH
+  "/usr/include/boost"
   "/usr/include/python2.7"
   "/usr/include/x86_64-linux-gnu/python2.7"
   "/usr/local/include/eigen3"
