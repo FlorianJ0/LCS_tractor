@@ -30,8 +30,9 @@ unstruct = True
 if unstruct:
     loc = '/media/backup/patients_article0/patient4/DOIRE^JEAN-LOUIS/DOIRE^JEAN_LOUIS_20060124/Simulation/VTK/'
     extend=np.array([0.05,0.15,0.04,0.14,0.2,0.3])
-    dim=np.array([50,50,50])
+    dim=np.array([20,20,20])
     vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk_unstructured.read_files(loc, dim, extend)
+    quit()
 elif struct:
     vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk.read_files(loc)
 elif anal:

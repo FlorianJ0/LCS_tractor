@@ -6,8 +6,9 @@ import numpy as np
 # from vtk import vtkRectilinearGridReader
 from vtk import vtkUnstructuredGridReader
 from vtk.util import numpy_support as vn
-from scipy.interpolate import RegularGridInterpolator
-
+from scipy.interpolate import griddata
+import psutil
+import
 # import shutil
 import glob
 
@@ -35,13 +36,13 @@ def read_files(loc, dim, extend):
         nx = dim[0]
         ny = dim[1]
         nz = dim[2]
-        bounds = data.GetBounds()
-        xmin = bounds[0]
-        xmax = bounds[1]
-        ymin = bounds[2]
-        ymax = bounds[3]
-        zmin = bounds[4]
-        zmax = bounds[5]
+        # bounds = data.GetBounds()
+        xmin = extend[0]
+        xmax = extend[1]
+        ymin = extend[2]
+        ymax = extend[3]
+        zmin = extend[4]
+        zmax = extend[5]
         domain = np.array([xmin, xmax, ymin, ymax, zmin, zmax])
 
         print 'file:', i
@@ -59,6 +60,12 @@ def read_files(loc, dim, extend):
             quit()
 
         print count
+        if psutil.swap_memory()[3]>10:
+            print 'swaaaaaaaaaaaaap'
+            quit()
+        grid_x, grid_y, grid_z = np.mgrid[xmin:xmax:nx*1j,ymin:ymax:ny*1j,zmin:zmax:nz*1j]
+
+        grid_z1 = griddata(pos, vectU, (grid_x, grid_y, grid_z), method='linear')
         # U=np.flipud(U)
         count += 1
     dt = 0.04
