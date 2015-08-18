@@ -12,6 +12,7 @@ import cauchygreen3d
 import gyronator
 import readUvtk_unstructured
 import numpy as np
+import sup3D
 # vitesse min pour savoir si on est in/out domain (a mettre a -100 pour la suite)
 outofdomain = 1E-16
 instat = True
@@ -20,6 +21,10 @@ simtstep = 0.04
 # read file/s
 loc = '/home/p0054421/MEGA/calcul/LCS_tractor/data'
 
+print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+print 'Goord morning %s' %sup3D.hello()
+print 'Welcome in my lair.'
+print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 
 unstruct = True
 if unstruct:

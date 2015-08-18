@@ -6,6 +6,7 @@ import numpy as np
 # from vtk import vtkRectilinearGridReader
 from vtk import vtkUnstructuredGridReader
 from vtk.util import numpy_support as vn
+from scipy.interpolate import RegularGridInterpolator
 
 # import shutil
 import glob
@@ -31,7 +32,6 @@ def read_files(loc, dim, extend):
         reader.ReadAllVectorsOn()
         reader.Update()
         data = reader.GetOutput()
-        # dim = data.GetDimensions()
         nx = dim[0]
         ny = dim[1]
         nz = dim[2]
@@ -48,19 +48,15 @@ def read_files(loc, dim, extend):
         print 'dim:', dim
         arrowglyph = data.GetPointData().GetArray('U')
         coord = data.GetPoint
-        # coord = vn.vtk_to_numpy(data.GetPoint)
         vectU = vn.vtk_to_numpy(arrowglyph)
-        # vectU[vectU < -20] = 'NaN'
-        if (count == 0):
-            U = np.empty((nx, ny, nz, len(dim), len(dircont)))
-        s = 0
+
         pos = np.empty((vectU.shape[0], 3))
         for l in xrange(vectU.shape[0]):
             pos[l][:] = np.array(coord(l))
-            # print pos[l][:].shape
-            # print pos[l][:]
 
-        print pos.shape
+        if pos.shape != vectU.shape:
+            print 'oups !'
+            quit()
 
         print count
         # U=np.flipud(U)
