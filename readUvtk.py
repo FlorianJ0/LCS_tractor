@@ -29,9 +29,10 @@ def read_files(loc):
         reader.Update()
         data = reader.GetOutput()
         dim = data.GetDimensions()
-        nx = dim[0]
-        ny = dim[1]
-        nz = dim[2]
+        nx = dim[0]-1
+        ny = dim[1]-1
+        nz = dim[2]-1
+
         bounds = data.GetBounds()
         xmin = bounds[0]
         xmax = bounds[1]
@@ -43,12 +44,12 @@ def read_files(loc):
 
         print 'file:', i
         print 'dim:', dim
-        arrowglyph = data.GetPointData().GetArray('internalMesh/U')
+        arrowglyph = data.GetCellData().GetArray('U')
         vectU = vn.vtk_to_numpy(arrowglyph)
         # vectU[vectU < -20] = 'NaN'
         if (count == 0):
             U = np.empty((nx, ny, nz, len(dim), len(dircont)))
-        s = 0
+        s=i=j=k = 0
         for k in xrange(nz):
             for j in xrange(ny):
                 for i in xrange(nx):

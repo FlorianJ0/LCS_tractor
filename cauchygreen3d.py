@@ -19,6 +19,7 @@ from scipy.integrate import ode
 from scipy.interpolate import griddata
 import inpolator
 from scipy.ndimage.filters import gaussian_filter
+import tricubic
 
 # import vtk
 # from vtk import *
@@ -46,7 +47,7 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     print 'vel shape'
     print vel.shape
     velp = vel
-    velp= gaussian_filter(velp, 0.5)
+    # velp= gaussian_filter(velp, 0.5)
     # print velp[25,25,:,:]
 
     ptlist = np.indices((nx, ny, nz))
@@ -366,8 +367,8 @@ def cgstki3(vel, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     V = interpU_i[:, :, 1, 0]
     magu = np.sqrt(U * U + V * V)
     # print grid_i[0, 5, :]- grid_iini[0, 5, :]
-    ax1.imshow(uu)
-    ax2.imshow(vv)
+    ax1.imshow(velpu[:,:,35,0])
+    ax2.imshow(velpv[:,:,35,0])
     ax3.imshow(eigval1)
     # ax2.imshow(magx)
     # ax2.imshow(didy)

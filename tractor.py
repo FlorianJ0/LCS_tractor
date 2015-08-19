@@ -25,24 +25,24 @@ print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 print 'Goord morning %s' %sup3D.hello()
 print 'Welcome in my lair.'
 print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+loc = '/media/backup/patients_article0/patient4/DOIRE^JEAN-LOUIS/DOIRE^JEAN_LOUIS_20060124/'
 
-struct = True
-if unstruct:
-    loc = '/media/backup/patients_article0/patient4/DOIRE^JEAN-LOUIS/DOIRE^JEAN_LOUIS_20060124/'
+struct = 'struct'
+if struct=='unstruct':
     extend=np.array([0.05,0.15,0.04,0.14,0.2,0.3])
     dim=np.array([20,20,20])
     vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk_unstructured.read_files(loc, dim, extend)
     quit()
-elif struct:
+elif struct=='struct':
     vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk.read_files(loc)
-elif anal:
+elif struct=='anal':
     vel, nx, ny, nz, dim_initial, tphys, dt, domain = gyronator.gyro()
 else:
     print 'wut ?'
     quit()
 
 print 'Velocity read'
-quit()
+# quit()
 
 """
 -sur [t0, t0+T] et n grilles G0 de PI 2D uniformes recti sur z (parceque ca m'arrange)
@@ -55,7 +55,7 @@ a partir des points de G1, calcul de gammaS1 d'apres conditions (voir h2)
 """
 
 # compute CG-strain tensor + eig/eiv on z plane
-z = 25.
+z = 21.
 # t = 3
 # calcul sur un plan x y parceque jsuis trop une feignasse pour un code generique
 dim = 2
