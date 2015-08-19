@@ -26,9 +26,9 @@ print 'Goord morning %s' %sup3D.hello()
 print 'Welcome in my lair.'
 print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 
-unstruct = True
+struct = True
 if unstruct:
-    loc = '/media/backup/patients_article0/patient4/DOIRE^JEAN-LOUIS/DOIRE^JEAN_LOUIS_20060124/Simulation/VTK/'
+    loc = '/media/backup/patients_article0/patient4/DOIRE^JEAN-LOUIS/DOIRE^JEAN_LOUIS_20060124/'
     extend=np.array([0.05,0.15,0.04,0.14,0.2,0.3])
     dim=np.array([20,20,20])
     vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk_unstructured.read_files(loc, dim, extend)

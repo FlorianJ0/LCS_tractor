@@ -3,13 +3,6 @@
 //This code is adapted from https://github.com/deepzot/likely
 TriCubicInterpolator::TriCubicInterpolator(list data, list nkpoints){
 
-   std::cout << "Boost version: " << std::hex
-          << ((BOOST_VERSION >> 20) & 0xF)
-          << "."
-          << ((BOOST_VERSION >> 8) & 0xFFF)
-          << "."
-          << (BOOST_VERSION & 0xFF)
-          << std::endl;
   
   _initialized = false;
   _spacing = 1.0;
