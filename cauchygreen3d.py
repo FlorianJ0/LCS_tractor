@@ -19,8 +19,12 @@ from scipy.integrate import ode
 from scipy.interpolate import griddata
 import inpolator
 from scipy.ndimage.filters import gaussian_filter
-import tricubic
+import sys
+sys.path.append('pytricubic-master/')
 
+# import imp
+import tricubic
+# imp.load_source('pytricubic-master/tricubic.so')
 # import vtk
 # from vtk import *
 
