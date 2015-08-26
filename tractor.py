@@ -13,6 +13,7 @@ import gyronator
 import readUvtk_unstructured
 import numpy as np
 import sup3D
+import time
 # vitesse min pour savoir si on est in/out domain (a mettre a -100 pour la suite)
 outofdomain = 1E-16
 instat = True
@@ -26,7 +27,7 @@ print 'Goord morning %s' %sup3D.hello()
 print 'Welcome in my lair.'
 print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 loc = '/media/backup/patients_article0/patient4/DOIRE^JEAN-LOUIS/DOIRE^JEAN_LOUIS_20060124/'
-
+stamp = time.time()
 struct = 'struct'
 if struct=='unstruct':
     extend=np.array([0.05,0.15,0.04,0.14,0.2,0.3])
@@ -34,6 +35,7 @@ if struct=='unstruct':
     vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk_unstructured.read_files(loc, dim, extend)
     quit()
 elif struct=='struct':
+
     vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk.read_files(loc)
 elif struct=='anal':
     vel, nx, ny, nz, dim_initial, tphys, dt, domain = gyronator.gyro()
@@ -41,8 +43,9 @@ else:
     print 'wut ?'
     quit()
 
-print 'Velocity read'
-# quit()
+print '-----------------------------------------------------'
+print 'Velocity read in %f s ' %(time.time()-stamp)
+print '-----------------------------------------------------'
 
 """
 -sur [t0, t0+T] et n grilles G0 de PI 2D uniformes recti sur z (parceque ca m'arrange)
@@ -55,7 +58,7 @@ a partir des points de G1, calcul de gammaS1 d'apres conditions (voir h2)
 """
 
 # compute CG-strain tensor + eig/eiv on z plane
-z = 21.
+z = 0.225
 # t = 3
 # calcul sur un plan x y parceque jsuis trop une feignasse pour un code generique
 dim = 2

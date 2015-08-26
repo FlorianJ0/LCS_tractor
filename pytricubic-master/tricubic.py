@@ -11,14 +11,21 @@ for i in range(n):
       
 ip = tricubic.tricubic(list(f), [n,2*n,n]) #initialize interpolator with input data on cubic grid
 
-print f.shape
+print f.shape, f.dtype
 
 
 
 
-
+# print f
 
 res=ip.ip(list(np.array([2,5,4])))
 # for i in range(100000):
   # res = ip.ip(list(np.random.rand(3)*(n-1))) #interpolate the function f at a random point in space
 print res
+
+for i in xrange(10*n):
+  ii=0.1*i
+  iii=int(ii)
+  print ip.ip(list(np.array([2,5,ii])))
+  print f[2,5,iii]
+  print '^^^'

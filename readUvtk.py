@@ -29,6 +29,7 @@ def read_files(loc):
         reader.Update()
         data = reader.GetOutput()
         dim = data.GetDimensions()
+
         nx = dim[0]-1
         ny = dim[1]-1
         nz = dim[2]-1
@@ -50,6 +51,8 @@ def read_files(loc):
         if (count == 0):
             U = np.empty((nx, ny, nz, len(dim), len(dircont)))
         s=i=j=k = 0
+
+
         for k in xrange(nz):
             for j in xrange(ny):
                 for i in xrange(nx):
