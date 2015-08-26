@@ -33,13 +33,15 @@ import tricubic
 
 # noinspection PyPep8Naming
 def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
-    x = np.arange(tt)
+    # x = np.arange(tt)
     ttt = int(tt / dt)
     ttt = np.arange(ttt)
-
+    # print ttt[0], ttt[-1]
     n = len(ttt)
-    N = 2  # rk45 int step
+    N = 25  # rk45 int step
     integrator = 'dopri5'  # ou dopri5 pour du dormant-prince rk45a-
+    rrk45 = 2 #0=rk45, 1=heun, 2= euler
+
 
     # tranche = zplan  # index de la tranche evaluee
     integ = 'rk45'
@@ -155,11 +157,11 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     # print 'fu'. f_u()
     solver = ode(f_u)
     solver.set_integrator('dopri5', rtol=0.001, atol=1e-3)
-    rrk45 = 0
+    t = np.linspace(0, tt, N)
+
     if rrk45==0:
         print 'rk45'
         toto=0
-        t = np.linspace(0,0.1,25)
         for i in xrange(nnx):
             for j in xrange(nny):
                 y0 = grid_iini[:, i, j, tranche]
@@ -171,12 +173,8 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                     grid_i[:, i, j, tranche] = y0
                     toto+=1
         print '%i point skipped, ie. %f percents of total points of the slice' %(toto, 100*toto/(ny*nx))
-                # print rk45(f_u, y0,t)
-                # print rk45(f_u, y0,t).shape
-                # grid_i[:, i, j, tranche], err = rk45(f_u, y0,t)
-    if rrk45 ==1:
+    elif rrk45 ==1:
         print 'heun'
-        t = np.linspace(0,0.1,25)
         toto=0
         for i in xrange(nnx):
             for j in xrange(nny):
@@ -187,60 +185,50 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                     grid_i[:, i, j, tranche] = y0
                     toto+=1
         print '%i point skipped, ie. %f percents of total points of the slice' %(toto, 100*toto/(ny*nx))
-
-    if rrk45 ==2:
+    elif rrk45 ==2:
         print 'euler'
-        t = np.linspace(0,0.1,25)
         toto=0
         for i in xrange(nnx):
             for j in xrange(nny):
-                y0 = grid_iini[:, i, j, tranche]
-                if np.all(np.abs(f_u(grid_i[:, i, j, tranche],0)) > np.array([1e-5,1e-5,1e-5])):
-                    grid_i[:, i, j, tranche] = euler(f_u, y0,t)
-                else:
-                    grid_i[:, i, j, tranche] = y0
-                    toto+=1
+                for k in range (tranche-1,tranche+2):
+                    y0 = grid_iini[:, i, j, k]
+                    if np.all(np.abs(f_u(grid_i[:, i, j, k],0)) > np.array([1e-5,1e-5,1e-5])):
+                        grid_i[:, i, j, k] = euler(f_u, y0,t)
+                    else:
+                        grid_i[:, i, j, k] = y0
+                        toto+=1
         print '%i point skipped, ie. %f percents of total points of the slice' %(toto, 100*toto/(ny*nx))
-
-
     else:
-        # t = np.linspace(ttt[0]*dt, (ttt[-1])*dt, N)
-        print grid_i[:,35,24,37]
-        print 'totototot'
-        t = ttt
-        t0 = t[0]
-        t1 = 0.001#t[-1]
-        # print 'ttttt', t
-        i = j = 0
-        for i in xrange(nnx):
-            for j in xrange(nny):
-                y0 = grid_i[:, i, j, tranche]
-                solver.set_initial_value(y0, t0)
-                sol = np.empty((N, 3))
-                sol[0] = y0
-                k = 1
-                dt=1e-3
-                while solver.successful() and solver.t < t1:
-                    solver.integrate(t[k])
-                    # print t[k]
-                    # solver.integrate(solver.t+dt)
-                    # print solver.y
-                    sol[k] = solver.y
-                    # print k
-                    k += 1
-                grid_i[:, i, j, tranche] = sol[-1, :]
-                # print y0-grid_i[:, i, j, tranche]
-                # print sol[0,:]
-                # print sol[-1,:]
-                # print 'tototo'
-                # print grid_i[:, i, j, zzplan]
-            # print 'i j', i, j
-            # print grid_i[:, i, j, tranche]
+        print 'wut ?'
+        quit()
+
+    # else:
+    #     print grid_i[:,35,24,37]
+    #     print 'totototot'
+    #     t = ttt
+    #     t0 = t[0]
+    #     t1 = 0.001#t[-1]
+    #     i = j = 0
+    #     for i in xrange(nnx):
+    #         for j in xrange(nny):
+    #             y0 = grid_i[:, i, j, tranche]
+    #             solver.set_initial_value(y0, t0)
+    #             sol = np.empty((N, 3))
+    #             sol[0] = y0
+    #             k = 1
+    #             dt=1e-3
+    #             while solver.successful() and solver.t < t1:
+    #                 solver.integrate(t[k])
+    #                 sol[k] = solver.y
+    #                 k += 1
+    #             grid_i[:, i, j, tranche] = sol[-1, :]
+
+
     print '-----------------------------------------------------'
     print 'Velocity advected  in %f s ' % (time.time() - stamp)
     print '-----------------------------------------------------'
 
-    FTF = False
+    FTF = True
     if FTF:
         stamp = time.time()
         # gradient of the flow map
@@ -250,15 +238,15 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         # 0,0 0,1 0,2
         # 1,0 1,1 1,2
         # 2,0 2,1 2,2
-        xx = np.linspace(domain[0], domain[1], nnx)
-        yy = np.linspace(domain[2], domain[3], nny)
-        zz = np.linspace(domain[4], domain[5], nnz)
+        # xx = np.linspace(domain[0], domain[1], nnx)
+        # yy = np.linspace(domain[2], domain[3], nny)
+        # zz = np.linspace(domain[4], domain[5], nnz)
         #
         dispu = grid_i[0, :, :, :]
         dispv = grid_i[1, :, :, :]
         dispw = grid_i[2, :, :, :]
 
-        tricu = False
+        tricu = True
 
         if tricu:
             print 'tricubic interp'
@@ -274,53 +262,43 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
             d2 = dy / 3
             d3 = dz / 3
             print 'totototottototototo'
-            print dispu.shape
-            print dispu[23, 57, 35]
-            print du.ip(list(np.array([23, 57, 35])))
-            ii = 0
-            jj = 0
-            print zplan
-            for i in xrange(74):
-                print dispu[23, 57, i]
-                # print dispu(list(np.array([45 , 45,i])))
-                print du.ip(list(np.array([23, 57, i])))
-            quit()
+            print dispu[25,25,tranche]
+            print du.ip(list(np.array([25,25,tranche])))
+            print (dw.ip(list(np.array([25, 25, zplan + 0.1]))) - dw.ip(list(np.array([25, 25, zplan - 0.1])))) / (2 * 0.1)
+            print (du.ip(list(np.array([26, 25, zplan ]))) - du.ip(list(np.array([24, 25, zplan])))) / (2 * 0.1)
+            print 'totototottototototo'
+            # print dispu.shape
+            # print dispu[23, 57, 35]
+            # print du.ip(list(np.array([23, 57, 35])))
+
             # print (du.ip(list(np.array([1 + d1, 1, zplan]))) - du.ip(list(np.array([1 - d1, 1, zplan])))) / (2 * d1)
             # 3d version haller ann. rev. fluid 2015
+            i = j = 0
             for i in range(1, nnx - 1):
                 for j in range(1, nny - 1):
-                    # for k in range(1, nnz - 1):
-                    # ACHTUNG CALCUL 3D MAIS SEED 2D
-                    ii = i  # * ddx + domain[0]
-                    jj = j  # * ddy + domain[2]
-                    zzzplan = zplan  # * dz + domain[4]
-                    # print ii,jj,zzzplan
-                    # print
-                    # print ii, jj, zzzplan
+                    if np.all(np.abs(f_u(grid_i[:, i, j, tranche],0)) > np.array([1e-5,1e-5,1e-5])):
+                        dphi[i, j, 0, 0] = (du.ip(list(np.array([i + d1, j, zplan]))) - du.ip(
+                            list(np.array([i - d1, j, zplan])))) / (2 * d1)
+                        dphi[i, j, 0, 1] = (du.ip(list(np.array([i, j + d2, zplan]))) - du.ip(
+                            list(np.array([i, j - d2, zplan])))) / (2 * d2)
+                        dphi[i, j, 0, 2] = (du.ip(list(np.array([i, j, zplan + d3]))) - du.ip(
+                            list(np.array([i, j, zplan - d3])))) / (2 * d3)
 
-                    dphi[i, j, 0, 0] = (du.ip(list(np.array([ii + d1, jj, zplan]))) - du.ip(
-                        list(np.array([ii - d1, jj, zplan])))) / (2 * d1)
-                    dphi[i, j, 0, 1] = (du.ip(list(np.array([ii, jj + d2, zplan]))) - du.ip(
-                        list(np.array([ii, jj - d2, zplan])))) / (2 * d2)
-                    dphi[i, j, 0, 2] = (du.ip(list(np.array([ii, jj, zplan + d3]))) - du.ip(
-                        list(np.array([ii, jj, zplan - d3])))) / (2 * d3)
+                        dphi[i, j, 1, 0] = (dv.ip(list(np.array([i + d1, j, zplan]))) - dv.ip(
+                            list(np.array([i - d1, j, zplan])))) / (2 * d1)
+                        dphi[i, j, 1, 1] = (dv.ip(list(np.array([i, j + d2, zplan]))) - dv.ip(
+                            list(np.array([i, j - d2, zplan])))) / (2 * d2)
+                        dphi[i, j, 1, 2] = (dv.ip(list(np.array([i, j, zplan + d3]))) - dv.ip(
+                            list(np.array([i, j, zplan - d3])))) / (2 * d3)
 
-                    dphi[i, j, 1, 0] = (dv.ip(list(np.array([ii + d1, jj, zplan]))) - dv.ip(
-                        list(np.array([ii - d1, jj, zplan])))) / (2 * d1)
-                    dphi[i, j, 1, 1] = (dv.ip(list(np.array([ii, jj + d2, zplan]))) - dv.ip(
-                        list(np.array([ii, jj - d2, zplan])))) / (2 * d2)
-                    dphi[i, j, 1, 2] = (dv.ip(list(np.array([ii, jj, zplan + d3]))) - dv.ip(
-                        list(np.array([ii, jj, zplan - d3])))) / (2 * d3)
+                        dphi[i, j, 2, 0] = (dw.ip(list(np.array([i + d1, j, zplan]))) - dw.ip(
+                            list(np.array([i - d1, j, zplan])))) / (2 * d1)
+                        dphi[i, j, 2, 1] = (dw.ip(list(np.array([i, j + d2, zplan]))) - dw.ip(
+                            list(np.array([i, j - d2, zplan])))) / (2 * d2)
+                        dphi[i, j, 2, 2] = (dw.ip(list(np.array([i, j, zplan + d3]))) - dw.ip(
+                            list(np.array([i, j, zplan - d3])))) / (2 * d3)
 
-                    dphi[i, j, 2, 0] = (dw.ip(list(np.array([ii + d1, jj, zplan]))) - dw.ip(
-                        list(np.array([ii - d1, jj, zplan])))) / (2 * d1)
-                    dphi[i, j, 2, 1] = (dw.ip(list(np.array([ii, jj + d2, zplan]))) - dw.ip(
-                        list(np.array([ii, jj - d2, zplan])))) / (2 * d2)
-                    dphi[i, j, 2, 2] = (dw.ip(list(np.array([ii, jj, zplan + d3]))) - dw.ip(
-                        list(np.array([ii, jj, zplan - d3])))) / (2 * d3)
-            print 'dphi[50,50,1,1]'
-            print dphi[50, 50, 1, 1]
-
+                    else : dphi[i,j,:,:] =  0
 
             # bords a l arrache;
             dphi[0, :, 0, 0] = dphi[1, :, 0, 0]
@@ -347,6 +325,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
             for i in xrange(nnx):
                 for j in xrange(nny):
                     gdphi[i, j, :, :] = np.dot(dphi[i, j, :, :].T, dphi[i, j, :, :])
+
 
         else:
             axes = (xx, yy, zz)
@@ -454,8 +433,8 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     magu = np.sqrt(U * U + V * V)
     # print grid_i[0, 5, :]- grid_iini[0, 5, :]
     ax1.imshow(velpu[:, :, tranche, 0])
-    ax2.imshow(grid_i[0, :, :, tranche]-grid_iini[0, :, :, tranche])
-    ax3.imshow(grid_i[2, :, :, tranche]-grid_iini[2, :, :, tranche])
+    ax2.imshow(dispu[:,:,tranche-1]-dispu[:,:,tranche+1])
+    ax3.imshow(dispu[:,:,tranche+1]-grid_iini[0,:,:,tranche+1])
     # ax3.imshow(grid_i[2, :, :,zzplan])
     # ax2.imshow(magx)
     # ax2.imshow(didy)
