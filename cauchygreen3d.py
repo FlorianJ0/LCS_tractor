@@ -20,7 +20,7 @@ from scipy.interpolate import griddata
 import inpolator
 from scipy.ndimage.filters import gaussian_filter
 import sys
-from airkaeffe import rk45, heun
+from airkaeffe import rk45, heun, euler
 sys.path.append('pytricubic-master/')
 
 # import imp
@@ -141,12 +141,12 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     def f_u(yy, t):
         # print 't', t
         # print yy[2]
-        if yy[0] > nx : yy[0]=nx
-        if yy[1] > ny : yy[1]=ny
-        if yy[2] > nz : yy[2]=nz
-        if yy[0] < 0 : yy[0] = 0
-        if yy[1] < 0 : yy[1] = 0
-        if yy[2] < 0 : yy[2] = 0
+        # if yy[0] > nx : yy[0]=nx
+        # if yy[1] > ny : yy[1]=ny
+        # if yy[2] > nz : yy[2]=nz
+        # if yy[0] < 0 : yy[0] = 0
+        # if yy[1] < 0 : yy[1] = 0
+        # if yy[2] < 0 : yy[2] = 0
 
         a =  np.array([fu(yy[0], yy[1], yy[2], t)/ddx, fv(yy[0], yy[1], yy[2], t)/ddy, fw(yy[0], yy[1], yy[2], t)/ddz])
         # a =  np.array([fu(yy[0], yy[1], yy[2], t)/ddx])
@@ -155,31 +155,52 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     # print 'fu'. f_u()
     solver = ode(f_u)
     solver.set_integrator('dopri5', rtol=0.001, atol=1e-3)
-    rrk45 = True
+    rrk45 = 0
     if rrk45==0:
         print 'rk45'
+        toto=0
         t = np.linspace(0,0.1,25)
         for i in xrange(nnx):
             for j in xrange(nny):
                 y0 = grid_iini[:, i, j, tranche]
-                grid_i[:, i, j, tranche], err = rk45(f_u, y0,t)
-                if np.max(err)>1e-5:
-                    print err, 'erreur d integ trop grande, my nigga'
+                if np.all(np.abs(f_u(grid_i[:, i, j, tranche],0)) > np.array([1e-5,1e-5,1e-5])):
+                    grid_i[:, i, j, tranche], err = rk45(f_u, y0,t)
+                    if np.max(err)>1e-5:
+                        print err, 'erreur d integ trop grande, my nigga'
+                else:
+                    grid_i[:, i, j, tranche] = y0
+                    toto+=1
+        print '%i point skipped, ie. %f percents of total points of the slice' %(toto, 100*toto/(ny*nx))
                 # print rk45(f_u, y0,t)
                 # print rk45(f_u, y0,t).shape
                 # grid_i[:, i, j, tranche], err = rk45(f_u, y0,t)
-        if rrk45 ==1
-        print 'rk45'
+    if rrk45 ==1:
+        print 'heun'
         t = np.linspace(0,0.1,25)
+        toto=0
         for i in xrange(nnx):
             for j in xrange(nny):
                 y0 = grid_iini[:, i, j, tranche]
-                grid_i[:, i, j, tranche] = heun(f_u, y0,t)
-                if np.max(err)>1e-5:
-                    print err, 'erreur d integ trop grande, my nigga'
-                # print rk45(f_u, y0,t)
-                # print rk45(f_u, y0,t).shape
-                # grid_i[:, i, j, tranche], err = rk45(f_u, y0,t)
+                if np.all(np.abs(f_u(grid_i[:, i, j, tranche],0)) > np.array([1e-5,1e-5,1e-5])):
+                    grid_i[:, i, j, tranche] = heun(f_u, y0,t)
+                else:
+                    grid_i[:, i, j, tranche] = y0
+                    toto+=1
+        print '%i point skipped, ie. %f percents of total points of the slice' %(toto, 100*toto/(ny*nx))
+
+    if rrk45 ==2:
+        print 'euler'
+        t = np.linspace(0,0.1,25)
+        toto=0
+        for i in xrange(nnx):
+            for j in xrange(nny):
+                y0 = grid_iini[:, i, j, tranche]
+                if np.all(np.abs(f_u(grid_i[:, i, j, tranche],0)) > np.array([1e-5,1e-5,1e-5])):
+                    grid_i[:, i, j, tranche] = euler(f_u, y0,t)
+                else:
+                    grid_i[:, i, j, tranche] = y0
+                    toto+=1
+        print '%i point skipped, ie. %f percents of total points of the slice' %(toto, 100*toto/(ny*nx))
 
 
     else:
