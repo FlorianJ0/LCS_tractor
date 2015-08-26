@@ -20,7 +20,7 @@ from scipy.interpolate import griddata
 import inpolator
 from scipy.ndimage.filters import gaussian_filter
 import sys
-
+from airkaeffe import rk45, heun
 sys.path.append('pytricubic-master/')
 
 # import imp
@@ -38,7 +38,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     ttt = np.arange(ttt)
 
     n = len(ttt)
-    N = 8  # rk45 int step
+    N = 2  # rk45 int step
     integrator = 'dopri5'  # ou dopri5 pour du dormant-prince rk45a-
 
     # tranche = zplan  # index de la tranche evaluee
@@ -138,27 +138,62 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     # eq dif => x point = v(x,t)
     # ou: y point = f(x,t)
     # fonction f:
-    def f_u(t, yy):
+    def f_u(yy, t):
         # print 't', t
-        return np.array([fu(yy[0], yy[1], yy[2], t)/ddx, fv(yy[0], yy[1], yy[2], t)/ddy, fw(yy[0], yy[1], yy[2], t)/ddz])
+        # print yy[2]
+        if yy[0] > nx : yy[0]=nx
+        if yy[1] > ny : yy[1]=ny
+        if yy[2] > nz : yy[2]=nz
+        if yy[0] < 0 : yy[0] = 0
+        if yy[1] < 0 : yy[1] = 0
+        if yy[2] < 0 : yy[2] = 0
 
+        a =  np.array([fu(yy[0], yy[1], yy[2], t)/ddx, fv(yy[0], yy[1], yy[2], t)/ddy, fw(yy[0], yy[1], yy[2], t)/ddz])
+        # a =  np.array([fu(yy[0], yy[1], yy[2], t)/ddx])
+
+        return a
+    # print 'fu'. f_u()
     solver = ode(f_u)
-    solver.set_integrator('dopri5', rtol=0, atol=1e-6)
-    odeint = False
-    if odeint:
-        print 'odeint'
+    solver.set_integrator('dopri5', rtol=0.001, atol=1e-3)
+    rrk45 = True
+    if rrk45==0:
+        print 'rk45'
+        t = np.linspace(0,0.1,25)
+        for i in xrange(nnx):
+            for j in xrange(nny):
+                y0 = grid_iini[:, i, j, tranche]
+                grid_i[:, i, j, tranche], err = rk45(f_u, y0,t)
+                if np.max(err)>1e-5:
+                    print err, 'erreur d integ trop grande, my nigga'
+                # print rk45(f_u, y0,t)
+                # print rk45(f_u, y0,t).shape
+                # grid_i[:, i, j, tranche], err = rk45(f_u, y0,t)
+        if rrk45 ==1
+        print 'rk45'
+        t = np.linspace(0,0.1,25)
+        for i in xrange(nnx):
+            for j in xrange(nny):
+                y0 = grid_iini[:, i, j, tranche]
+                grid_i[:, i, j, tranche] = heun(f_u, y0,t)
+                if np.max(err)>1e-5:
+                    print err, 'erreur d integ trop grande, my nigga'
+                # print rk45(f_u, y0,t)
+                # print rk45(f_u, y0,t).shape
+                # grid_i[:, i, j, tranche], err = rk45(f_u, y0,t)
 
 
     else:
         # t = np.linspace(ttt[0]*dt, (ttt[-1])*dt, N)
+        print grid_i[:,35,24,37]
+        print 'totototot'
         t = ttt
         t0 = t[0]
-        t1 = 0.1#t[-1]
+        t1 = 0.001#t[-1]
         # print 'ttttt', t
         i = j = 0
         for i in xrange(nnx):
             for j in xrange(nny):
-                y0 = grid_iini[:, i, j, tranche]
+                y0 = grid_i[:, i, j, tranche]
                 solver.set_initial_value(y0, t0)
                 sol = np.empty((N, 3))
                 sol[0] = y0
@@ -168,20 +203,21 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                     solver.integrate(t[k])
                     # print t[k]
                     # solver.integrate(solver.t+dt)
-                    print solver.y
+                    # print solver.y
                     sol[k] = solver.y
                     # print k
                     k += 1
                 grid_i[:, i, j, tranche] = sol[-1, :]
+                # print y0-grid_i[:, i, j, tranche]
                 # print sol[0,:]
                 # print sol[-1,:]
                 # print 'tototo'
                 # print grid_i[:, i, j, zzplan]
-            print 'i j', i, j
-            print grid_i[:, i, j, tranche]
-        print '-----------------------------------------------------'
-        print 'Velocity advected  in %f s ' % (time.time() - stamp)
-        print '-----------------------------------------------------'
+            # print 'i j', i, j
+            # print grid_i[:, i, j, tranche]
+    print '-----------------------------------------------------'
+    print 'Velocity advected  in %f s ' % (time.time() - stamp)
+    print '-----------------------------------------------------'
 
     FTF = False
     if FTF:
@@ -397,13 +433,13 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     magu = np.sqrt(U * U + V * V)
     # print grid_i[0, 5, :]- grid_iini[0, 5, :]
     ax1.imshow(velpu[:, :, tranche, 0])
-    ax2.imshow(grid_i[0, :, :, tranche])
-    ax3.imshow(grid_i[1, :, :, tranche])
+    ax2.imshow(grid_i[0, :, :, tranche]-grid_iini[0, :, :, tranche])
+    ax3.imshow(grid_i[2, :, :, tranche]-grid_iini[2, :, :, tranche])
     # ax3.imshow(grid_i[2, :, :,zzplan])
     # ax2.imshow(magx)
     # ax2.imshow(didy)
     # ax2.imshow(didy)
-    ax4.imshow(velpv[:, :, tranche, 0])
+    ax4.imshow(velpw[:, :, tranche, 0])
     # ax3.quiver(X, Y, U, V, color=magu)
     # ax4.streamplot(X, Y, uu, vv, density=0.6, color='k', linewidth=magx)
     plt.show()

@@ -58,7 +58,7 @@ a partir des points de G1, calcul de gammaS1 d'apres conditions (voir h2)
 """
 
 # compute CG-strain tensor + eig/eiv on z plane
-z = 0.225
+z = 0.21
 # t = 3
 # calcul sur un plan x y parceque jsuis trop une feignasse pour un code generique
 dim = 2
