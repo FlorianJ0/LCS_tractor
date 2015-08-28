@@ -50,11 +50,8 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, tphys, dt, nx, ny, nz
         initpts = helic(eigvec3, dx, dy, dz)
         # f, ((ax1, ax2)) = plt.subplots(2)
         uu = initpts
-        print uu.nonzero()
-        print '000'
-        print uu[uu.nonzero()]
-        print '000'
-        print uu.nonzero().shape, uu[uu.nonzero()].shape
+        coord = np.array([initpts.nonzero()[0],initpts.nonzero()[1]])
+        print coord, coord.shape
         # imgplot = plt.imshow(halp)
         f, (ax1, ax2) = plt.subplots(2, 1,sharey=True)
         ax1.imshow(np.abs(uu))
