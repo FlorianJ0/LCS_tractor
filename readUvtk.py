@@ -47,7 +47,8 @@ def read_files(loc):
         print 'dim:', dim
         arrowglyph = data.GetCellData().GetArray('U')
         vectU = vn.vtk_to_numpy(arrowglyph)
-        vectU[vectU < -20] = 'NaN'
+        # vectU[vectU < -20] = 'NaN'
+        # if np.all(vectU) < np.array([1e-8,1e-8,1e-8])):
         if (count == 0):
             U = np.empty((nx, ny, nz, len(dim), len(dircont)))
         s=i=j=k = 0
@@ -56,6 +57,9 @@ def read_files(loc):
         for k in xrange(nz):
             for j in xrange(ny):
                 for i in xrange(nx):
+                    # if np.all(vectU[s])  <1e-8:
+                    #     U[j, i, k, :, count] = [np.nan, np.nan, np.nan]
+                    # else:
                     U[j, i, k, :, count] = vectU[s]
                     s += 1
         # print U[25,25,25,0:2,count]

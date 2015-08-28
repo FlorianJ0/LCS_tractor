@@ -33,6 +33,10 @@ from progrss import  update_progress
 # from vtk import *
 
 # noinspection PyPep8Naming
+
+def rpog():
+    print("# "),
+
 def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     # x = np.arange(tt)
     ttt = int(tt / dt)
@@ -44,9 +48,9 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     rrk45 = 2 #0=rk45, 1=heun, 2= euler
 
     #small (so is your dick) vector d1(d1 0 0) d2(0 d2 0) d3(0 0 d3)
-    d1 = 0.1
-    d2 = 0.1
-    d3 = 0.1
+    d1 = 0.9
+    d2 = 0.9
+    d3 = 0.9
 
     # tranche = zplan  # index de la tranche evaluee
     integ = 'rk45'
@@ -164,17 +168,21 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     t = np.linspace(0, tt, N)
     # dispu = dispv = dispw = np.zeros((nnx, nny, nnz))
     if rrk45==0:
-        print 'rk45'
+        print 'rk45, a checker'
         toto=0
+        quit()
         for i in xrange(nnx):
             for j in xrange(nny):
                 y0 = grid_iini[:, i, j, tranche]
-                if np.all(np.abs(f_u(grid_i[:, i, j, tranche],0)) > np.array([1e-7,1e-7,1e-7])):
+                # if np.all(np.abs(f_u(grid_i[:, i, j, tranche],0)) > np.array([1e-7,1e-7,1e-7])):
+                if np.all(np.abs(velp[i, j, tranche, :]) > np.array([1e-7,1e-7,1e-7])):
                     grid_i[:, i, j, tranche], err = rk45(f_u, y0,t)
                     if np.max(err)>1e-5:
                         print err, 'erreur d integ trop grande, my nigga'
                 else:
                     # grid_i[:, i, j, tranche] = y0
+                    #on en profite pour faire le mask!!!
+
                     toto+=1
         print '%i point skipped, ie. %f percents of total points of the slice' %(toto, 100*toto/(ny*nx))
     elif rrk45 ==1:
@@ -193,20 +201,23 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     elif rrk45 ==2:
         print 'euler'
         toto = a = 0
+        print ('0            50          100%')
         for i in xrange(nnx):
             for j in xrange(nny):
                 for k in range (tranche-2,tranche+3):
                     y0 = grid_iini[:, i, j, k]
+
                     if np.all(np.abs(velp[i,j,k,:,0]) > np.array([1e-7,1e-7,1e-7])):
                         grid_i[:, i, j, k] = euler(f_u, y0,t)
                     else:
-                        grid_i[:, i, j, k] = [0, 0, 0]
+                        # grid_i[:, i, j, k] = [0, 0, 0]
                         toto+=1
             a = 1.*i/nnx
             if (100*a)%10<1e-3:
-                print update_progress(a)
+                rpog()
 
-        print '%i point skipped, ie. %f percents of total points of the domain' %(toto, 100*toto/(ny*nx*5))
+
+        print '\n %i point skipped, ie. %f percents of total points of the domain' %(toto, 100*toto/(ny*nx*5))
     else:
         print 'wut ?'
         quit()
@@ -259,7 +270,8 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
 
 
             tata=0
-            print
+            print ('0            50          100%')
+
             # 3d version haller ann. rev. fluid 2015
             for i in range(1, nnx - 1):
                 for j in range(1, nny - 1):
@@ -292,8 +304,8 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                         tata+=1
                 a = 1.*i/nnx
                 if (100*a)%10<1e-3:
-                    print update_progress(a)
-            print tata, 'skipped'
+                    rpog()
+            print '\n', tata, ' skipped'
 
             # bords a l arrache;
             dphi[0, :, 0, 0] = dphi[1, :, 0, 0]
@@ -417,7 +429,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         print 'Flow map and eigval/eigvec computed in %f s ' % (time.time() - stamp)
         print '-----------------------------------------------------'
 
-    f, ((ax1, ax2, ax3), (ax4, ax5, ax6), (ax7, ax8, ax9)) = plt.subplots(3,3)
+    f, ((ax1, ax2, ax3), (ax4, ax5, ax6), (ax7, ax8, ax9)) = plt.subplots(3,3,sharex=True,sharey=True)
     # print didx.shape
     Y, X = np.mgrid[0:nx * dx:rr * nx * 1j, 0:ny * dy:rr * ny * 1j]
 
@@ -429,9 +441,9 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     V = interpU_i[:, :, 1, 0]
     magu = np.sqrt(U * U + V * V)
     # print grid_i[0, 5, :]- grid_iini[0, 5, :]
-    ax4.imshow(velpu[:, :, tranche, 0])
-    ax5.imshow(velpv[:, :, tranche, 0])
-    ax6.imshow(velpw[:, :, tranche, 0])
+    ax4.imshow(velpu[:, :, tranche, 0],vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
+    ax5.imshow(velpv[:, :, tranche, 0],vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
+    ax6.imshow(velpw[:, :, tranche, 0],vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
     # ax2.imshow(dispu[:,:,tranche-1]-dispu[:,:,tranche+1])
     # ax3.imshow(dispu[:,:,tranche+1]-grid_iini[0,:,:,tranche+1])
     # ax3.imshow(grid_i[2, :, :,zzplan])
@@ -451,6 +463,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
 
     # ax3.quiver(X, Y, U, V, color=magu)
     # ax4.streamplot(X, Y, uu, vv, density=0.6, color='k', linewidth=magx)
+
     plt.show()
 
     print '-------------------------'
