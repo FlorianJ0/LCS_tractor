@@ -305,7 +305,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                 a = 1. * i / nnx
                 if (100 * a) % 10 < 1e-3:
                     rpog()
-            print '\n', tata, ' skipped'
+            print '\n', tata, ' skipped of,', nnx*nny
 
             # bords a l arrache;
             dphi[0, :, 0, 0] = dphi[1, :, 0, 0]
@@ -410,13 +410,13 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         eigval1 = np.empty((nnx, nny))
         eigval3 = np.empty((nnx, nny))
 
-        print 'min,max,avg,stdev'
-        a = eigenValues[:, :, 0] * eigenValues[:, :, 1] * eigenValues[:, :, 2]
-        print np.min(a)
-        print np.max(a)
-        print np.average(a)
-        print np.std(a)
-        print '{{{{{{'
+        # print 'min,max,avg,stdev'
+        # a = eigenValues[:, :, 0] * eigenValues[:, :, 1] * eigenValues[:, :, 2]
+        # # print np.min(a)
+        # # print np.max(a)
+        # # print np.average(a)
+        # # print np.std(a)
+        # # print '{{{{{{'
 
         for i in xrange(eigenValues.shape[0]):
             for j in xrange(eigenValues.shape[1]):
@@ -424,6 +424,9 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                 eigval3[i, j] = np.max(eigenValues[i, j, :])
                 eigvec1[i, j, :] = eigenVectors[i, j, :, np.argmin(eigenValues[i, j, :])]
                 eigvec3[i, j, :] = eigenVectors[i, j, :, np.argmax(eigenValues[i, j, :])]
+                print eigenVectors[i, j, :, np.argmax(eigenValues[i, j, :])]
+                print eigenVectors[i, j,:]
+
 
         print '-----------------------------------------------------'
         print 'Flow map and eigval/eigvec computed in %f s ' % (time.time() - stamp)

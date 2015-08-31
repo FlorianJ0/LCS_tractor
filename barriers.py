@@ -28,6 +28,9 @@ def helic(vect, dx, dy, dz):
 
 def reduced_lines(vect, dx, dy, dz, initpts):
     print 'integrate reduced LCSs'
+    # for i in xrange(initpts.shape[1]):
+    #     print initpts[:,i]
+    print initpts
     # on suppose qu on est toujours normal  a z
     # norm vect = 0 0 -1
     # donc n vectproduct k = kj -ki 0
@@ -50,15 +53,15 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, tphys, dt, nx, ny, nz
         # print eigvecm.shape
         initpts = helic(eigvec3, dx, dy, dz)
         # f, ((ax1, ax2)) = plt.subplots(2)
-        uu = initpts
+        # initptsb = initpts[initpts>0]
         coord = np.array([initpts.nonzero()[0], initpts.nonzero()[1]])
         print coord, coord.shape
         # imgplot = plt.imshow(halp)
         f, (ax1, ax2) = plt.subplots(2, 1, sharey=True)
-        ax1.imshow(np.abs(uu))
-        ax2.imshow(uu)
+        ax1.imshow(np.abs(initpts))
+        ax2.imshow(initpts)
         plt.show()
-        reduced_lines(eigvec3, dx, dy, dz, initpts)
+        reduced_lines(eigvec3, dx, dy, dz, coord)
         # r = eigenVectors[0]
     elif toto == 1:
         print 'hyperbolic attracting LCS'
