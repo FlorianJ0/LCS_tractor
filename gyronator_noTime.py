@@ -50,4 +50,4 @@ def gyro():
 
 
 
-    return vel, nx, ny, nz, dim_initial, ttot, domain__author__ = 'p0054421'
+    return vel, nx, ny, nz, dim_initial, ttot, domain

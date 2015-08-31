@@ -8,26 +8,27 @@ def helic(vect, dx, dy, dz):
     print 'vect shape', vect.shape
     nx = vect.shape[0]
     ny = vect.shape[1]
-    dd=np.empty([nx,ny,3])
-    ddd=np.empty([nx,ny])
+    dd = np.empty([nx, ny, 3])
+    ddd = np.empty([nx, ny])
     eps0 = 1e-2
     # at each point, 3d grad vector of 3D eigenc
     for i in xrange(nx):
         for j in xrange(ny):
-            dd[i,j,:]=np.gradient(vect[i,j,:])
-            ddd[i,j]=np.dot(vect[i,j,:],dd[i,j,:])
+            dd[i, j, :] = np.gradient(vect[i, j, :])
+            ddd[i, j] = np.dot(vect[i, j, :], dd[i, j, :])
             # if abs(ddd[i,j])<eps0:
             #     ddd[i,j]=True
             # else
             #     ddd[i,j]=False
-    a = abs(ddd)<eps0
+    a = abs(ddd) < eps0
     ddd *= a
 
     return ddd
 
+
 def reduced_lines(vect, dx, dy, dz, initpts):
     print 'integrate reduced LCSs'
-    #on suppose qu on est toujours normal  a z
+    # on suppose qu on est toujours normal  a z
     # norm vect = 0 0 -1
     # donc n vectproduct k = kj -ki 0
     # la trajectoire est portee par le vect kj -ki 0 donc dans le plan
@@ -50,10 +51,10 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, tphys, dt, nx, ny, nz
         initpts = helic(eigvec3, dx, dy, dz)
         # f, ((ax1, ax2)) = plt.subplots(2)
         uu = initpts
-        coord = np.array([initpts.nonzero()[0],initpts.nonzero()[1]])
+        coord = np.array([initpts.nonzero()[0], initpts.nonzero()[1]])
         print coord, coord.shape
         # imgplot = plt.imshow(halp)
-        f, (ax1, ax2) = plt.subplots(2, 1,sharey=True)
+        f, (ax1, ax2) = plt.subplots(2, 1, sharey=True)
         ax1.imshow(np.abs(uu))
         ax2.imshow(uu)
         plt.show()

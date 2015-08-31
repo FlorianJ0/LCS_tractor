@@ -1,14 +1,12 @@
 __author__ = 'p0054421'
-import time, sys
+
 
 # update_progress() : Displays or updates a console progress bar
 ## Accepts a float between 0 and 1. Any int will be converted to a float.
 ## A value under 0 represents a 'halt'.
 ## A value at 1 or bigger represents 100%
 def update_progress(progress):
-
-
-    barLength = 10 # Modify this to change the length of the progress bar
+    barLength = 10  # Modify this to change the length of the progress bar
     status = ""
     if isinstance(progress, int):
         progress = float(progress)
@@ -22,7 +20,7 @@ def update_progress(progress):
         progress = 1
         status = "Done...\r\n"
     # block = int(round(barLength*progress))
-    block = int(round(barLength*0.1))
+    block = int(round(barLength * 0.1))
     print ("#"),
     return
     # text = "Percent: [{0}] {1}% {2}".format( "#"*block + "-"*(barLength-block), progress*100, status)

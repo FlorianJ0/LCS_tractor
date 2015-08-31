@@ -22,13 +22,12 @@ import matplotlib.pyplot as plt
 
 # noinspection PyPep8Naming
 def cgstki(vel, z, tt, dt, nx, ny, dim, domain, simtstep):
-
     x = np.arange(tt)
-    ttt = int(tt/dt)
-    ttt=np.arange(ttt)
-    n=len(ttt)
+    ttt = int(tt / dt)
+    ttt = np.arange(ttt)
+    n = len(ttt)
     velp = np.empty((nx, ny, dim, n))
-        # velp[x,y,(i,j,k), t]
+    # velp[x,y,(i,j,k), t]
 
     # velp = vel
 
@@ -37,7 +36,7 @@ def cgstki(vel, z, tt, dt, nx, ny, dim, domain, simtstep):
 
     # if doublegyre
     velp[:, :, :, :] = vel[:, :, z, 0:2, :]
-    print velp[25,25,:,:]
+    print velp[25, 25, :, :]
 
     ptlist = np.indices((nx, ny))
     ptlist = ptlist.astype(float)
@@ -50,7 +49,7 @@ def cgstki(vel, z, tt, dt, nx, ny, dim, domain, simtstep):
     nnx = nx * rr
     nny = ny * rr
 
-    ptlist[0] = ptlist[0] * dx +  domain[0]
+    ptlist[0] = ptlist[0] * dx + domain[0]
     ptlist[1] = ptlist[1] * dy + domain[2]
     ptlistini = ptlist
 
@@ -107,8 +106,8 @@ def cgstki(vel, z, tt, dt, nx, ny, dim, domain, simtstep):
     # print grid_i
     # timeinter = False
     # if timeinter:
-        # a putain de refaire avec inperpolate.interpnd
-        # k = 0
+    # a putain de refaire avec inperpolate.interpnd
+    # k = 0
     print 'interpolation over space, dx/ %i' % rr
     print domain
     print nx, ny, nnx, nny
@@ -129,14 +128,14 @@ def cgstki(vel, z, tt, dt, nx, ny, dim, domain, simtstep):
     # interpU_i[:, :, 0, :] = interpU[:, :, 0,:]
     interpU_i[:, :, 1, :] = newgridv[:, :, :]
     # interpU_i[:, :, 1, :] = interpU[:, :, 1,:]
-    print 'toto',points.shape, val.shape, grid.shape
+    print 'toto', points.shape, val.shape, grid.shape
     print np.max(newgridu)
     # print grid[0]
     # else:
-        # interpU_i = velp
+    # interpU_i = velp
     print 'avection time !'
     for ti in ttt:
-        print 'advection from time ', ti*dt, 'to ', dt*(ti+1)
+        print 'advection from time ', ti * dt, 'to ', dt * (ti + 1)
         print 'ti', ti
         # totou = interp2d(grid[0, :, :], grid[1, :, :], interpU_i[:, :, 0, ti], kind='linear')
         # print 'x', grid_iini[0, :, 0]
@@ -159,7 +158,8 @@ def cgstki(vel, z, tt, dt, nx, ny, dim, domain, simtstep):
     if ftle:
         for i in range(1, nnx - 1):
             for j in range(1, nny - 1):
-                dphi[i, j, 0, 0] = (grid_i[0, i + 1, j] - grid_i[0, i - 1, j]) / (grid_iini[0, i + 1, j] - grid_iini[0, i - 1, j])
+                dphi[i, j, 0, 0] = (grid_i[0, i + 1, j] - grid_i[0, i - 1, j]) / (
+                grid_iini[0, i + 1, j] - grid_iini[0, i - 1, j])
                 dphi[i, j, 0, 1] = (grid_i[0, i, j + 1] - grid_i[0, i, j - 1]) / (
                     grid_iini[1, i, j + 1] - grid_iini[1, i, j - 1])
                 dphi[i, j, 1, 0] = (grid_i[1, i + 1, j] - grid_i[1, i - 1, j]) / (
@@ -201,28 +201,27 @@ def cgstki(vel, z, tt, dt, nx, ny, dim, domain, simtstep):
                 pass
                 # feuteuleu[i, j] = np.sqrt(LA.eigvals(gdphi[i, j, :, :])[1])
                 # print len(LA.eigvals(gdphi[i, j, :, :]))
-        # print LA.eigvals(gdphi[20, 20, :,:])
+                # print LA.eigvals(gdphi[20, 20, :,:])
 
-    eigenValues = np.empty((nnx, nny,2)) # en chaque point, 2 eigval + 2 eigvec
-    eigenVectors = np.empty((nnx, nny, 2,2)) # en chaque point, 2 eigval + 2 eigvec
+    eigenValues = np.empty((nnx, nny, 2))  # en chaque point, 2 eigval + 2 eigvec
+    eigenVectors = np.empty((nnx, nny, 2, 2))  # en chaque point, 2 eigval + 2 eigvec
 
     print '111'
-    eigenValues,eigenVectors=LA.eig(gdphi)
+    eigenValues, eigenVectors = LA.eig(gdphi)
 
     stamp = time.time()
     for i in xrange(nnx):
         for j in xrange(nny):
-            if eigenValues[i,j,0]<eigenValues[i,j,0]:
-                print i,j, 'EIG NOT ORDERED DAMMIT'
-    print 'time= %f' %(time.time()-stamp)
-
+            if eigenValues[i, j, 0] < eigenValues[i, j, 0]:
+                print i, j, 'EIG NOT ORDERED DAMMIT'
+    print 'time= %f' % (time.time() - stamp)
 
     f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
     # print didx.shape
     Y, X = np.mgrid[0:nx * dx:rr * nx * 1j, 0:ny * dy:rr * ny * 1j]
 
-    uu = grid_i[0, :, :]-grid_iini[0,:,:]  # -grid_iini[0,:,:]
-    vv = grid_i[1, :, :]-grid_iini[1,:,:]  # -grid_iini[1,:,:]
+    uu = grid_i[0, :, :] - grid_iini[0, :, :]  # -grid_iini[0,:,:]
+    vv = grid_i[1, :, :] - grid_iini[1, :, :]  # -grid_iini[1,:,:]
     magx = np.sqrt(uu * uu + vv * vv)
     U = interpU_i[:, :, 0, 0]
     V = interpU_i[:, :, 1, 0]
@@ -241,4 +240,4 @@ def cgstki(vel, z, tt, dt, nx, ny, dim, domain, simtstep):
     print '-------------------------'
     print 'error', np.random.random_integers(0, 100)
     print '-------------------------'
-    return eigenValues,eigenVectors, interpU_i
+    return eigenValues, eigenVectors, interpU_i

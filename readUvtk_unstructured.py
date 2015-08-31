@@ -80,7 +80,7 @@ def read_files(loc, dim, extend):
         grid = grid.swapaxes(1,0)
 
         for k in xrange(vectU.shape[0]):
-            if toto[0,k,2] > zmin and toto[0,k,2] < zmax:
+            if zmin < toto[0,k,2] < zmax:
                 x[k,:] = toto[0,k,:]
                 u[k,:] = toto[1,k,:]
             else:
@@ -90,7 +90,7 @@ def read_files(loc, dim, extend):
         # a[~np.isnan(a).any(axis=1)]
         # toto=toto[~np.isnan(toto).any(axis=2)]
         print 'plein de nan ajoutes'
-        # print "after", toto.nbytes
+        # print "after", toto.nbyZtes
         print u.shape, x.shape
         swaap()
         # print toto.shape
