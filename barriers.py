@@ -17,8 +17,8 @@ def helic(vect, dx, dy, dz):
     # at each point, 3d grad vector of 3D eigenc
     for i in xrange(nx):
         for j in xrange(ny):
-            dd[i, j, :] = np.gradient(vect[i, j, :])
-            ddd[i, j] = np.dot(vect[i, j, :], dd[i, j, :])
+            # dd[i, j, :] = np.gradient(vect[i, j, :])
+            ddd[i, j] = np.dot(vect[i, j, :], np.gradient(vect[i, j, :]))
             # if abs(ddd[i,j])<eps0:
             #     ddd[i,j]=True
             # else
@@ -33,36 +33,30 @@ def helic(vect, dx, dy, dz):
 def reduced_lines(vect, nx, ny, nz, initpts):
     x = np.arange(0, nx, 1)
     y = np.arange(0, ny, 1)
-    vecti = vect[:,:,:]
-    print vect.shape
-    print 'vect shape'
-    print x.shape, y.shape
+    vecti = vect[:,:,0]
+    vectj = vect[:,:,1]
+
     # vectj = vect[:,:,1]
-    axes = (x, y, 2)
+    axes = (x, y)
     vi = IF(axes, vecti)
-    print vi(15,15)
-    print vi(25,15)
-    print vi(35,15)
-    print vi(15,25)
+    vj = IF(axes, vectj)
+
     # vj = IF(axes, vectj)
 
 
     def gamma(x, t):
         newpos = np.empty((2))
-        cond = np.dot(vect[x[0], x[1], :], np.gradient(vect[x[0], x[1], :]))
+        # print 'x', x
+        a = np.array([vi(x[0], x[1]),vj(x[0], x[1])])
+        cond = np.dot(a, np.gradient(a))
         if (abs(cond) < 5e-1):
             #i did the maths, must be right
-            newpos[0] = - 1. * vect[x[0], x[1], 1]
-            newpos[1] =  1. * vect[x[0], x[1], 0]
-            # print cond
+            newpos[0] = - 1. * vj(x[0], x[1]) * 1.
+            newpos[1] =  1. * vi(x[0], x[1]) * 1.
             # print newpos
-            # print - 1. * vect[x[0], x[1], 1]
-            # print '000000000000000000000000000'
+            # print vj(x[0], x[1])
+            # print '+'
 
-        else:
-            newpos[0] = x[0]
-            newpos[1] = x[1]
-        # print 'cond', cond
         return newpos
     print 'integrate reduced LCSs'
     N = 50
@@ -75,17 +69,13 @@ def reduced_lines(vect, nx, ny, nz, initpts):
 
     for i in xrange(initpts.shape[1]):
         y0 = initpts[:, i]*1.
-        line[i, :, :] = euler(gamma, y0, t).swapaxes(1,0)
-        # print y0
-        # print line[i, :, :]
-        # print '-*---------------*-'
-        #
-        # print i
-        # print y0
-        # print line
-        # print line.shape
-        # print line[-1]
-
+        line[i, :, :] = heun(gamma, y0, t).swapaxes(1,0)
+        print 'line number %i' %i
+        print y0
+        print line[i, :, -1]
+        print line.shape
+        fname = 'toto' + str(i)
+        np.savetxt(fname, line[i,:,:])
     return line
 
 def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, tphys, dt, nx, ny, nz, domain, simtstep):
@@ -114,8 +104,8 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, tphys, dt, nx, ny, nz
     #         k+=1
 
     f, (ax1, ax2) = plt.subplots(2, 1, sharey=True)
-    ax1.imshow(np.abs(initpts))
-    ax2.imshow(toto)
+    ax1.imshow(initpts)
+    ax2.imshow(initpts0)
     plt.show()
 
 
