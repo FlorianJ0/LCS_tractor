@@ -21,12 +21,8 @@ import inpolator
 from scipy.ndimage.filters import gaussian_filter
 import sys
 from airkaeffe import rk45, heun, euler
-
 sys.path.append('pytricubic-master/')
-
-# import imp
 import tricubic
-from progrss import update_progress
 
 
 # imp.load_source('pytricubic-master/tricubic.so')
@@ -151,25 +147,14 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     # ou: y point = f(x,t)
     # fonction f:
     def f_u(yy, t):
-        # print 't', t
-        # print yy[2]
-        # if yy[0] > nx : yy[0]=nx
-        # if yy[1] > ny : yy[1]=ny
-        # if yy[2] > nz : yy[2]=nz
-        # if yy[0] < 0 : yy[0] = 0
-        # if yy[1] < 0 : yy[1] = 0
-        # if yy[2] < 0 : yy[2] = 0
-
         a = np.array(
             [fu(yy[0], yy[1], yy[2], t) / ddx, fv(yy[0], yy[1], yy[2], t) / ddy, fw(yy[0], yy[1], yy[2], t) / ddz])
-
         return a
 
     # print 'fu'. f_u()
     solver = ode(f_u)
     solver.set_integrator('dopri5', rtol=0.001, atol=1e-3)
     t = np.linspace(0, tt, N)
-    # dispu = dispv = dispw = np.zeros((nnx, nny, nnz))
     if rrk45 == 0:
         print 'rk45, a checker'
         toto = 0
@@ -179,7 +164,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                 y0 = grid_iini[:, i, j, tranche]
                 # if np.all(np.abs(f_u(grid_i[:, i, j, tranche],0)) > np.array([1e-7,1e-7,1e-7])):
                 if np.all(np.abs(velp[i, j, tranche, :]) > np.array([1e-7, 1e-7, 1e-7])):
-                    grid_i[:, i, j, tranche], err = rk45(f_u, y0, t)
+                    grid_i[:, i, j, tranche], err = rk45(f_u, y0, t)[-1]
                     if np.max(err) > 1e-5:
                         print err, 'erreur d integ trop grande, my nigga'
                 else:
@@ -196,7 +181,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                 for k in range(tranche - 2, tranche + 3):
                     y0 = grid_iini[:, i, j, k]
                     if np.all(np.abs(velp[i, j, k, :, 0]) > np.array([1e-7, 1e-7, 1e-7])):
-                        grid_i[:, i, j, k] = heun(f_u, y0, t)
+                        grid_i[:, i, j, k] = heun(f_u, y0, t)[-1]
                     else:
                         grid_i[:, i, j, k] = [0, 0, 0]
                         toto += 1
@@ -207,11 +192,11 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         print ('0            50          100%')
         for i in xrange(nnx):
             for j in xrange(nny):
-                for k in range(tranche - 2, tranche + 3):
+                for k in range(tranche - 1, tranche + 2):
                     y0 = grid_iini[:, i, j, k]
 
                     if np.all(np.abs(velp[i, j, k, :, 0]) > np.array([1e-7, 1e-7, 1e-7])):
-                        grid_i[:, i, j, k] = euler(f_u, y0, t)
+                        grid_i[:, i, j, k] = euler(f_u, y0, t)[-1]
                     else:
                         # grid_i[:, i, j, k] = [0, 0, 0]
                         toto += 1
@@ -424,8 +409,6 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                 eigval3[i, j] = np.max(eigenValues[i, j, :])
                 eigvec1[i, j, :] = eigenVectors[i, j, :, np.argmin(eigenValues[i, j, :])]
                 eigvec3[i, j, :] = eigenVectors[i, j, :, np.argmax(eigenValues[i, j, :])]
-                print eigenVectors[i, j, :, np.argmax(eigenValues[i, j, :])]
-                print eigenVectors[i, j,:]
 
 
         print '-----------------------------------------------------'

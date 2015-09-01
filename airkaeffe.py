@@ -126,7 +126,7 @@ def euler(f, x0, t):
     for i in xrange(n - 1):
         x[i + 1] = x[i] + (t[i + 1] - t[i]) * f(x[i], t[i])
 
-    return x[-1]
+    return x
 
 
 def heun(f, x0, t):
@@ -160,4 +160,4 @@ def heun(f, x0, t):
         k2 = h * f(x[i] + k1, t[i + 1])
         x[i + 1] = x[i] + (k1 + k2) / 2.0
 
-    return x[-1]
+    return x
