@@ -54,20 +54,20 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     integ = 'rk45'
 
     # if doublegyre
-    print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-    print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-    print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-    print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-    print 'WARING DOMAIN CUT FOR TEST PURPOSE'
-    print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-    print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-    print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-    print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-    velp = velp[:, :60, :, :, :]
-    ny = velp.shape[1]
-
-    print 'velp shape'
-    print velp.shape
+    # print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+    # print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+    # print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+    # print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+    # print 'WARING DOMAIN CUT FOR TEST PURPOSE'
+    # print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+    # print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+    # print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+    # print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+    # velp = velp[:, :60, :, :, :]
+    # ny = velp.shape[1]
+    #
+    # print 'velp shape'
+    # print velp.shape
 
     # ptlist = np.indices((nx, ny, nz))
     # ptlist = ptlist.astype(float)

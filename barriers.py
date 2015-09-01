@@ -3,7 +3,8 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 from airkaeffe import rk45, heun, euler
-
+from scipy.interpolate import RectBivariateSpline
+from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 
 
 def helic(vect, dx, dy, dz):
@@ -30,6 +31,22 @@ def helic(vect, dx, dy, dz):
 
 
 def reduced_lines(vect, nx, ny, nz, initpts):
+    x = np.arange(0, nx, 1)
+    y = np.arange(0, ny, 1)
+    vecti = vect[:,:,:]
+    print vect.shape
+    print 'vect shape'
+    print x.shape, y.shape
+    # vectj = vect[:,:,1]
+    axes = (x, y, 2)
+    vi = IF(axes, vecti)
+    print vi(15,15)
+    print vi(25,15)
+    print vi(35,15)
+    print vi(15,25)
+    # vj = IF(axes, vectj)
+
+
     def gamma(x, t):
         newpos = np.empty((2))
         cond = np.dot(vect[x[0], x[1], :], np.gradient(vect[x[0], x[1], :]))
@@ -59,9 +76,9 @@ def reduced_lines(vect, nx, ny, nz, initpts):
     for i in xrange(initpts.shape[1]):
         y0 = initpts[:, i]*1.
         line[i, :, :] = euler(gamma, y0, t).swapaxes(1,0)
-        print y0
-        print line[i, :, :]
-        print '-*---------------*-'
+        # print y0
+        # print line[i, :, :]
+        # print '-*---------------*-'
         #
         # print i
         # print y0
@@ -88,12 +105,13 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, tphys, dt, nx, ny, nz
     seeds0 = np.array([initpts0.nonzero()[0], initpts0.nonzero()[1]])
     stretch_lines = reduced_lines(eigvec1, nx, ny, nz, seeds0)
     print stretch_lines.shape
-    k = 0
-    toto=np.empty((stretch_lines.shape[0]*stretch_lines.shape[1],2))
-    for i in xrange(stretch_lines.shape[0]):
-        for j in xrange(stretch_lines.shape[1]):
-            toto[k,:] = stretch_lines[i,:,k]
-            k+=1
+    # k = 0
+    # toto=np.empty((stretch_lines.shape[0]*stretch_lines.shape[1],2))
+    # tata = initpts * 0
+    # for i in xrange(stretch_lines.shape[0]):
+    #     for j in xrange(stretch_lines.shape[1]):
+    #         toto[k,:] = stretch_lines[i,:,k]
+    #         k+=1
 
     f, (ax1, ax2) = plt.subplots(2, 1, sharey=True)
     ax1.imshow(np.abs(initpts))
