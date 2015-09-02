@@ -108,6 +108,23 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     print 'stretch lines computed  in %f s ' % (time.time() - stamp)
     print '-----------------------------------------------------'
 
+    stamp = time.time()
+    nnp =np.dot(np.sqrt(np.sqrt(eigval1)/(np.sqrt(eigval1)+np.sqrt(eigval3))), eigvec1) + np.dot(np.sqrt(np.sqrt(eigval3)/(np.sqrt(eigval1)+np.sqrt(eigval3))), eigvec3)
+    initpts0 = helic(nnp, dx, dy, dz)
+    seeds0 = np.array([initpts0.nonzero()[0], initpts0.nonzero()[1]])
+    ellipticp_lines = reduced_lines(nnp, nx, ny, nz, seeds0, 0.8)
+    print '-----------------------------------------------------'
+    print '+elliptic lines computed  in %f s ' % (time.time() - stamp)
+    print '-----------------------------------------------------'
+
+    stamp = time.time()
+    nnm = np.dot(np.sqrt(np.sqrt(eigval1)/(np.sqrt(eigval1)+np.sqrt(eigval3))), eigvec1) - np.dot(np.sqrt(np.sqrt(eigval3)/(np.sqrt(eigval1)+np.sqrt(eigval3))), eigvec3)
+    initpts0 = helic(nnm, dx, dy, dz)
+    seeds0 = np.array([initpts0.nonzero()[0], initpts0.nonzero()[1]])
+    ellipticm_lines = reduced_lines(nnm, nx, ny, nz, seeds0, 0.8)
+    print '-----------------------------------------------------'
+    print '-elliptic lines computed  in %f s ' % (time.time() - stamp)
+    print '-----------------------------------------------------'
 
     # print stretch_lines.shape
     # k = 0
@@ -117,29 +134,37 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     #     for j in xrange(stretch_lines.shape[1]):
     #         toto[k,:] = stretch_lines[i,:,k]
     #         k+=1
-    plt.subplot(221)
+    plt.subplot(231)
     # f, (ax1, ax2) = plt.subplots(2, 1, sharey=True)
     # plt.imshow(initpts)
     # plt.imshow(initpts0)
     magU = np.sqrt(vel[:,:,14,0,0]**2+vel[:,:,14,1,0]**2+vel[:,:,14,2,0]**2)
     plt.imshow(magU)
     for i in xrange(stretch_lines.shape[0]):
-        plt.plot(stretch_lines[i,1,:], stretch_lines[i,0,:], 'k.-', ms=1)
+        plt.plot(stretch_lines[i,1,:], stretch_lines[i,0,:], 'k-', ms=1)
 
-    plt.subplot(222)
+    plt.subplot(232)
     plt.imshow(magU)
     for j in xrange(strain_lines.shape[0]):
         plt.plot(strain_lines[17,1,:], strain_lines[17,0,:], 'ro-', ms=1)
 
 
 
-    plt.subplot(223)
+    plt.subplot(233)
     plt.imshow(vel[:,:,14,0,0])
 
-    plt.subplot(224)
+    plt.subplot(234)
     plt.imshow(vel[:,:,14,1,0])
 
+    plt.subplot(235)
+    plt.imshow(magU)
+    for j in xrange(strain_lines.shape[0]):
+        plt.plot(ellipticp_lines[17,1,:], strain_lines[17,0,:], 'ro-', ms=1)
 
+    plt.subplot(236)
+    plt.imshow(magU)
+    for j in xrange(strain_lines.shape[0]):
+        plt.plot(ellipticm_lines[17,1,:], strain_lines[17,0,:], 'ro-', ms=1)
 
     plt.show()
 
