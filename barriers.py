@@ -30,12 +30,11 @@ def helic(vect, dx, dy, dz):
     return ddd
 
 
-
 def reduced_lines(vect, nx, ny, nz, initpts, thresh):
     x = np.arange(0, nx, 1)
     y = np.arange(0, ny, 1)
-    vecti = vect[:,:,0]
-    vectj = vect[:,:,1]
+    vecti = vect[:, :, 0]
+    vectj = vect[:, :, 1]
 
     # vectj = vect[:,:,1]
     axes = (x, y)
@@ -48,37 +47,39 @@ def reduced_lines(vect, nx, ny, nz, initpts, thresh):
     def gamma(x, t):
         newpos = np.empty((2))
         # print 'x', x
-        a = np.array([vi(x[0], x[1]),vj(x[0], x[1])])
+        a = np.array([vi(x[0], x[1]), vj(x[0], x[1])])
         cond = np.dot(a, np.gradient(a))
         if (abs(cond) < thresh):
-            #i did the maths, must be right
+            # i did the maths, must be right
             newpos[0] = - 1. * vj(x[0], x[1])
-            newpos[1] =  1. * vi(x[0], x[1])
+            newpos[1] = 1. * vi(x[0], x[1])
             # print newpos
             # print vj(x[0], x[1])
             # print '+'
-        # else:
+            # else:
             # print 'stop criteria'
         return newpos
+
     print 'integrate reduced LCSs'
     N = 100
     # on suppose qu on est toujours normal  a z
     # norm vect = 0 0 -1
     # donc n vectproduct k = kj -ki 0
     # la trajectoire est portee par le vect kj -ki 0 donc dans le plan
-    t = np.linspace(0, 50, N) #pseudo integrator
-    line = np.zeros ((initpts.shape[1], 2, N))
+    t = np.linspace(0, 50, N)  # pseudo integrator
+    line = np.zeros((initpts.shape[1], 2, N))
 
     for i in xrange(initpts.shape[1]):
-        y0 = initpts[:, i]*1.
-        line[i, :, :] = heun(gamma, y0, t).swapaxes(1,0)
-        print 'line number %i' %i
+        y0 = initpts[:, i] * 1.
+        line[i, :, :] = heun(gamma, y0, t).swapaxes(1, 0)
+        print 'line number %i' % i
         # print y0
         # print line[i, :, -1]
         # print line.shape
         # fname = 'toto' + str(i)
         # np.savetxt(fname, line[i,:,:])
     return line
+
 
 def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, ny, nz, domain, simtstep):
     dx = abs(domain[1] - domain[0]) / nx
@@ -99,7 +100,6 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     print 'strain lines computed  in %f s ' % (time.time() - stamp)
     print '-----------------------------------------------------'
 
-
     stamp = time.time()
     initpts0 = helic(eigvec1, dx, dy, dz)
     seeds0 = np.array([initpts0.nonzero()[0], initpts0.nonzero()[1]])
@@ -109,7 +109,8 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     print '-----------------------------------------------------'
 
     stamp = time.time()
-    nnp =np.dot(np.sqrt(np.sqrt(eigval1)/(np.sqrt(eigval1)+np.sqrt(eigval3))), eigvec1) + np.dot(np.sqrt(np.sqrt(eigval3)/(np.sqrt(eigval1)+np.sqrt(eigval3))), eigvec3)
+    nnp = np.dot(np.sqrt(np.sqrt(eigval1) / (np.sqrt(eigval1) + np.sqrt(eigval3))), eigvec1) + np.dot(
+        np.sqrt(np.sqrt(eigval3) / (np.sqrt(eigval1) + np.sqrt(eigval3))), eigvec3)
     initpts0 = helic(nnp, dx, dy, dz)
     seeds0 = np.array([initpts0.nonzero()[0], initpts0.nonzero()[1]])
     ellipticp_lines = reduced_lines(nnp, nx, ny, nz, seeds0, 0.8)
@@ -118,7 +119,8 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     print '-----------------------------------------------------'
 
     stamp = time.time()
-    nnm = np.dot(np.sqrt(np.sqrt(eigval1)/(np.sqrt(eigval1)+np.sqrt(eigval3))), eigvec1) - np.dot(np.sqrt(np.sqrt(eigval3)/(np.sqrt(eigval1)+np.sqrt(eigval3))), eigvec3)
+    nnm = np.dot(np.sqrt(np.sqrt(eigval1) / (np.sqrt(eigval1) + np.sqrt(eigval3))), eigvec1) - np.dot(
+        np.sqrt(np.sqrt(eigval3) / (np.sqrt(eigval1) + np.sqrt(eigval3))), eigvec3)
     initpts0 = helic(nnm, dx, dy, dz)
     seeds0 = np.array([initpts0.nonzero()[0], initpts0.nonzero()[1]])
     ellipticm_lines = reduced_lines(nnm, nx, ny, nz, seeds0, 0.8)
@@ -138,34 +140,30 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     # f, (ax1, ax2) = plt.subplots(2, 1, sharey=True)
     # plt.imshow(initpts)
     # plt.imshow(initpts0)
-    magU = np.sqrt(vel[:,:,14,0,0]**2+vel[:,:,14,1,0]**2+vel[:,:,14,2,0]**2)
+    magU = np.sqrt(vel[:, :, 14, 0, 0] ** 2 + vel[:, :, 14, 1, 0] ** 2 + vel[:, :, 14, 2, 0] ** 2)
     plt.imshow(magU)
     for i in xrange(stretch_lines.shape[0]):
-        plt.plot(stretch_lines[i,1,:], stretch_lines[i,0,:], 'k-', ms=1)
+        plt.plot(stretch_lines[i, 1, :], stretch_lines[i, 0, :], 'k-', ms=1)
 
     plt.subplot(232)
     plt.imshow(magU)
     for j in xrange(strain_lines.shape[0]):
-        plt.plot(strain_lines[17,1,:], strain_lines[17,0,:], 'ro-', ms=1)
-
-
+        plt.plot(strain_lines[17, 1, :], strain_lines[17, 0, :], 'ro-', ms=1)
 
     plt.subplot(233)
-    plt.imshow(vel[:,:,14,0,0])
+    plt.imshow(vel[:, :, 14, 0, 0])
 
     plt.subplot(234)
-    plt.imshow(vel[:,:,14,1,0])
+    plt.imshow(vel[:, :, 14, 1, 0])
 
     plt.subplot(235)
     plt.imshow(magU)
     for j in xrange(strain_lines.shape[0]):
-        plt.plot(ellipticp_lines[17,1,:], strain_lines[17,0,:], 'ro-', ms=1)
+        plt.plot(ellipticp_lines[17, 1, :], strain_lines[17, 0, :], 'ro-', ms=1)
 
     plt.subplot(236)
     plt.imshow(magU)
     for j in xrange(strain_lines.shape[0]):
-        plt.plot(ellipticm_lines[17,1,:], strain_lines[17,0,:], 'ro-', ms=1)
+        plt.plot(ellipticm_lines[17, 1, :], strain_lines[17, 0, :], 'ro-', ms=1)
 
     plt.show()
-
-

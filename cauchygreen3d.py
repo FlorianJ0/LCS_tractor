@@ -17,6 +17,7 @@ from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 from scipy.integrate import ode
 import sys
 from airkaeffe import rk45, heun, euler
+
 sys.path.append('pytricubic-master/')
 import tricubic
 
@@ -93,7 +94,6 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
 
     # interp spatiale sur une grille r fois plus fine
 
-
     grid = np.indices((nnx, nny, nnz))
     grid = grid.astype(float)
 
@@ -143,10 +143,10 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     # ou: y point = f(x,t)
     # fonction f:
     def f_u(yy, t):
-        if yy[2]<0:
-            yy[2]=0
-        if yy[2]>nnz:
-            yy[2]=nnz
+        if yy[2] < 0:
+            yy[2] = 0
+        if yy[2] > nnz:
+            yy[2] = nnz
         a = np.array(
             [fu(yy[0], yy[1], yy[2], t) / ddx, fv(yy[0], yy[1], yy[2], t) / ddy, fw(yy[0], yy[1], yy[2], t) / ddz])
         return a
@@ -230,7 +230,6 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     #                 k += 1
     #             grid_i[:, i, j, tranche] = sol[-1, :]
 
-
     print '-----------------------------------------------------'
     print 'Velocity advected  in %f s ' % (time.time() - stamp)
     print '-----------------------------------------------------'
@@ -290,7 +289,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                 a = 1. * i / nnx
                 if (100 * a) % 10 < 1e-3:
                     rpog()
-            print '\n', tata, ' skipped of,', nnx*nny
+            print '\n', tata, ' skipped of,', nnx * nny
 
             # bords a l arrache;
             dphi[0, :, 0, 0] = dphi[1, :, 0, 0]
@@ -317,7 +316,6 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
             for i in xrange(nnx):
                 for j in xrange(nny):
                     gdphi[i, j, :, :] = np.dot(dphi[i, j, :, :].T, dphi[i, j, :, :])
-
 
         else:
             quit()
@@ -410,7 +408,6 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                 eigvec1[i, j, :] = eigenVectors[i, j, :, np.argmin(eigenValues[i, j, :])]
                 eigvec3[i, j, :] = eigenVectors[i, j, :, np.argmax(eigenValues[i, j, :])]
 
-
         print '-----------------------------------------------------'
         print 'Flow map and eigval/eigvec computed in %f s ' % (time.time() - stamp)
         print '-----------------------------------------------------'
@@ -444,9 +441,6 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     ax8.imshow(dphi[:, :, 0, 1])
     ax9.imshow(dphi[:, :, 1, 1])
     # ax2.imshow(didy)
-
-
-
     # ax3.quiver(X, Y, U, V, color=magu)
     # ax4.streamplot(X, Y, uu, vv, density=0.6, color='k', linewidth=magx)
 
