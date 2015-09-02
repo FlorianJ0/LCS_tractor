@@ -6,7 +6,6 @@ from scipy import *
 # from vtk.util import numpy_support as vn
 # import pygsl._numobj as numx
 import time
-from pygsl import odeiv
 # from pygsl import spline, errors
 # from pygsl import _numobj as numx
 import scipy.version as ver
@@ -16,9 +15,6 @@ import matplotlib.pyplot as plt
 from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 # from scipy.interpolate import RegularGridInterpolator as IF
 from scipy.integrate import ode
-from scipy.interpolate import griddata
-import inpolator
-from scipy.ndimage.filters import gaussian_filter
 import sys
 from airkaeffe import rk45, heun, euler
 sys.path.append('pytricubic-master/')
@@ -46,9 +42,9 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     rrk45 = 2  # 0=rk45, 1=heun, 2= euler
 
     # small (so is your dick) vector d1(d1 0 0) d2(0 d2 0) d3(0 0 d3)
-    d1 = 0.9
-    d2 = 0.9
-    d3 = 0.9
+    d1 = 0.1
+    d2 = 0.1
+    d3 = 0.1
 
     # tranche = zplan  # index de la tranche evaluee
     integ = 'rk45'
@@ -147,6 +143,10 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     # ou: y point = f(x,t)
     # fonction f:
     def f_u(yy, t):
+        if yy[2]<0:
+            yy[2]=0
+        if yy[2]>nnz:
+            yy[2]=nnz
         a = np.array(
             [fu(yy[0], yy[1], yy[2], t) / ddx, fv(yy[0], yy[1], yy[2], t) / ddy, fw(yy[0], yy[1], yy[2], t) / ddz])
         return a

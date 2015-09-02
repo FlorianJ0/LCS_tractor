@@ -5,15 +5,17 @@ __date__ = '30 Juillet 2015'
 'obj: calculer les  LCS hyperboliques depuis un champ de vitesse, ecoulement incompressible, periodique de sang dans un' \
 'AAA. Si possible ajouter LCS  elliptic et parabolic si j ai le temps. Le tout sur du vtk structured'
 #
+import numpy as np
+import time
+
 import readUvtk
-import cauchygreen
 import barriers
 import cauchygreen3d
 import gyronator
 import readUvtk_unstructured
-import numpy as np
 import sup3D
-import time
+
+
 # vitesse min pour savoir si on est in/out domain (a mettre a -100 pour la suite)
 outofdomain = 1E-16
 instat = True
@@ -65,5 +67,5 @@ dim = 2
 
 
 eigval1, eigval3, eigvec1, eigvec3, interpU_i = cauchygreen3d.cgstki3(vel, z, tphys, dt, nx, ny, nz, 3, domain, simtstep)
-barriers.barrier_type(0, eigval1, eigval3, eigvec1, eigvec3, tphys, dt, nx, ny, nz, domain, simtstep)
+barriers.barrier_type(0, eigval1, eigval3, eigvec1, eigvec3, interpU_i, tphys, dt, nx, ny, nz, domain, simtstep)
 # barriers.barrier_type(0, eigval, eigvec, tphys, dt, nx, ny, domain, simtstep)
