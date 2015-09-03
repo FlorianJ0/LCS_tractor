@@ -5,7 +5,7 @@ import time
 import matplotlib.pyplot as plt
 from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 
-from airkaeffe import euler
+from airkaeffe import heun
 
 
 def rpog():
@@ -53,30 +53,28 @@ def reduced_lines(vect, nx, ny, nz, initpts, thresh):
         # print 'x', x
         a = np.array([vi(x[0], x[1]), vj(x[0], x[1])])
         cond = np.dot(a, np.gradient(a))
-        if (abs(cond) < thresh):
+        cut = False
+        if (1e-4 < abs(cond) < thresh):
             # i did the maths, must be right
             newpos[0] = - 1. * vj(x[0], x[1])
             newpos[1] = 1. * vi(x[0], x[1])
-            # print newpos
-            # print vj(x[0], x[1])
-            # print '+'
         else:
-            newpos[:] = [0, 0]
+            cut = True
 
-        return newpos
+        return newpos, cut
 
     print 'integrate reduced LCSs'
-    N = 50
+    N = 100
     # on suppose qu on est toujours normal  a z
     # norm vect = 0 0 -1
     # donc n vectproduct k = kj -ki 0
     # la trajectoire est portee par le vect kj -ki 0 donc dans le plan
-    t = np.linspace(0, 10, N)  # pseudo integrator
+    t = np.linspace(0, 20, N)  # pseudo integrator
     line = np.zeros((initpts.shape[1], 2, N))
     print ('0            50          100%')
     for i in xrange(initpts.shape[1]):
         y0 = initpts[:, i] * 1.
-        line[i, :, :] = euler(gamma, y0, t).swapaxes(1, 0)
+        line[i, :, :] = heun(gamma, y0, t, nx, ny).swapaxes(1, 0)
         # print 'line number %i' % i
         # print y0
         # print line[i, :, -1]
@@ -118,20 +116,20 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     print '-----------------------------------------------------'
 
 
-
+    ftle = (1/0.16)*np.log(np.sqrt(eigval3+1e-8))
     magU = np.sqrt(vel[:, :, 14, 0, 0] ** 2 + vel[:, :, 14, 1, 0] ** 2 + vel[:, :, 14, 2, 0] ** 2)
 
     plt.subplot(321)
-    plt.imshow(magU)
+    plt.imshow(eigval3)
     for j in xrange(strain_lines.shape[0]):
-        plt.plot(strain_lines[:, 1, :], strain_lines[:, 0, :], 'k.', ms=1)
+        plt.plot(strain_lines[:, 1, :], strain_lines[:, 0, :], 'w-', ms=1)
     plt.colorbar()
     plt.title('strain_lines, (eiv 3)')
 
     plt.subplot(322)
-    plt.imshow(magU)
+    plt.imshow(eigval1)
     for i in xrange(stretch_lines.shape[0]):
-        plt.plot(stretch_lines[i, 1, :], stretch_lines[i, 0, :], 'k.', ms=1)
+        plt.plot(stretch_lines[i, 1, :], stretch_lines[i, 0, :], 'w-', ms=1)
     plt.colorbar()
     plt.title('strain_lines, (eiv 1)')
 
@@ -151,9 +149,9 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     plt.title('initpts3')
 
     plt.subplot(326)
-    plt.imshow((initpts1))
+    plt.imshow(ftle, vmin=0, vmax=8, cmap='jet', aspect='auto')
     plt.colorbar()
-    plt.title('initpts1')
+    plt.title('ftle')
 
 
 

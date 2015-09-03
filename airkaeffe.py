@@ -129,7 +129,7 @@ def euler(f, x0, t):
     return x
 
 
-def heun(f, x0, t):
+def heun(f, x0, t, nx, ny):
     """Heun's method to solve x' = f(x,t) with x(t[0]) = x0.
 
     USAGE:
@@ -155,9 +155,21 @@ def heun(f, x0, t):
     n = len(t)
     x = numpy.array([x0] * n)
     for i in xrange(n - 1):
-        h = t[i + 1] - t[i]
-        k1 = h * f(x[i], t[i])
-        k2 = h * f(x[i] + k1, t[i + 1])
-        x[i + 1] = x[i] + (k1 + k2) / 2.0
+        if f(x[i], t[i])[1]:
+            x[i + 1] = x[i]
+            break
+        elif x[i][0] > (nx-2) or x[i][0] < 2 or x[i][1] > (ny-2) or x[i][1]<2:
+            x[i+1] = x[i]
+            print 'out of grid'
+            break
+
+        else:
+            h = t[i + 1] - t[i]
+            k1 = h * f(x[i], t[i])[0]
+            k2 = h * f(x[i] + k1, t[i + 1])[0]
+            x[i + 1] = x[i] + (k1 + k2) / 2.0
+
+
+
 
     return x
