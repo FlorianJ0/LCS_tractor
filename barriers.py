@@ -5,16 +5,19 @@ import time
 import matplotlib.pyplot as plt
 from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 
-from airkaeffe import heun
+from airkaeffe import euler
 
 
-def helic(vect, dx, dy, dz):
+def rpog():
+    print("# "),
+
+def helic(vect, dx, dy, dz, eps0):
     print 'vect shape', vect.shape
     nx = vect.shape[0]
     ny = vect.shape[1]
     dd = np.empty([nx, ny, 3])
     ddd = np.empty([nx, ny])
-    eps0 = 5e-1
+    # eps0 = 5e-1
     # at each point, 3d grad vector of 3D eigenc
     for i in xrange(nx):
         for j in xrange(ny):
@@ -24,6 +27,7 @@ def helic(vect, dx, dy, dz):
             #     ddd[i,j]=True
             # else
             #     ddd[i,j]=False
+
     a = abs(ddd) < eps0
     ddd *= a
 
@@ -33,8 +37,8 @@ def helic(vect, dx, dy, dz):
 def reduced_lines(vect, nx, ny, nz, initpts, thresh):
     x = np.arange(0, nx, 1)
     y = np.arange(0, ny, 1)
-    vecti = vect[:, :, 0]
-    vectj = vect[:, :, 1]
+    vecti = (vect[:, :, 0])
+    vectj = (vect[:, :, 1])
 
     # vectj = vect[:,:,1]
     axes = (x, y)
@@ -56,28 +60,34 @@ def reduced_lines(vect, nx, ny, nz, initpts, thresh):
             # print newpos
             # print vj(x[0], x[1])
             # print '+'
-            # else:
-            # print 'stop criteria'
+        else:
+            newpos[:] = [0, 0]
+
         return newpos
 
     print 'integrate reduced LCSs'
-    N = 100
+    N = 50
     # on suppose qu on est toujours normal  a z
     # norm vect = 0 0 -1
     # donc n vectproduct k = kj -ki 0
     # la trajectoire est portee par le vect kj -ki 0 donc dans le plan
-    t = np.linspace(0, 50, N)  # pseudo integrator
+    t = np.linspace(0, 10, N)  # pseudo integrator
     line = np.zeros((initpts.shape[1], 2, N))
-
+    print ('0            50          100%')
     for i in xrange(initpts.shape[1]):
         y0 = initpts[:, i] * 1.
-        line[i, :, :] = heun(gamma, y0, t).swapaxes(1, 0)
-        print 'line number %i' % i
+        line[i, :, :] = euler(gamma, y0, t).swapaxes(1, 0)
+        # print 'line number %i' % i
         # print y0
         # print line[i, :, -1]
         # print line.shape
         # fname = 'toto' + str(i)
         # np.savetxt(fname, line[i,:,:])
+        a = 1. * i / initpts.shape[1]
+        if (100 * a) % 10 < 1e-1:
+                    rpog()
+
+    print '\n'
     return line
 
 
@@ -92,78 +102,71 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     # print eigvec.shape
     # print eigvecm.shape
     stamp = time.time()
-    initpts = helic(eigvec3, dx, dy, dz)
-    seeds = np.array([initpts.nonzero()[0], initpts.nonzero()[1]])
-    strain_lines = reduced_lines(eigvec3, nx, ny, nz, seeds, 5)
-
+    initpts3 = helic(eigvec3, dx, dy, dz, 0.005)
+    seeds3 = np.array([initpts3.nonzero()[0], initpts3.nonzero()[1]])
+    strain_lines = reduced_lines(eigvec3, nx, ny, nz, seeds3, 1)
     print '-----------------------------------------------------'
-    print 'strain lines computed  in %f s ' % (time.time() - stamp)
-    print '-----------------------------------------------------'
-
-    stamp = time.time()
-    initpts0 = helic(eigvec1, dx, dy, dz)
-    seeds0 = np.array([initpts0.nonzero()[0], initpts0.nonzero()[1]])
-    stretch_lines = reduced_lines(eigvec1, nx, ny, nz, seeds0, 0.8)
-    print '-----------------------------------------------------'
-    print 'stretch lines computed  in %f s ' % (time.time() - stamp)
+    print 'strain lines (repelling) computed  in %f s ' % (time.time() - stamp)
     print '-----------------------------------------------------'
 
     stamp = time.time()
-    nnp = np.dot(np.sqrt(np.sqrt(eigval1) / (np.sqrt(eigval1) + np.sqrt(eigval3))), eigvec1) + np.dot(
-        np.sqrt(np.sqrt(eigval3) / (np.sqrt(eigval1) + np.sqrt(eigval3))), eigvec3)
-    initpts0 = helic(nnp, dx, dy, dz)
-    seeds0 = np.array([initpts0.nonzero()[0], initpts0.nonzero()[1]])
-    ellipticp_lines = reduced_lines(nnp, nx, ny, nz, seeds0, 0.8)
+    initpts1 = helic(eigvec1, dx, dy, dz, 0.05)
+    seeds1 = np.array([initpts1.nonzero()[0], initpts1.nonzero()[1]])
+    stretch_lines = reduced_lines(eigvec1, nx, ny, nz, seeds1, 4)
     print '-----------------------------------------------------'
-    print '+elliptic lines computed  in %f s ' % (time.time() - stamp)
+    print 'stretch (attracting) lines computed  in %f s ' % (time.time() - stamp)
     print '-----------------------------------------------------'
 
-    stamp = time.time()
-    nnm = np.dot(np.sqrt(np.sqrt(eigval1) / (np.sqrt(eigval1) + np.sqrt(eigval3))), eigvec1) - np.dot(
-        np.sqrt(np.sqrt(eigval3) / (np.sqrt(eigval1) + np.sqrt(eigval3))), eigvec3)
-    initpts0 = helic(nnm, dx, dy, dz)
-    seeds0 = np.array([initpts0.nonzero()[0], initpts0.nonzero()[1]])
-    ellipticm_lines = reduced_lines(nnm, nx, ny, nz, seeds0, 0.8)
-    print '-----------------------------------------------------'
-    print '-elliptic lines computed  in %f s ' % (time.time() - stamp)
-    print '-----------------------------------------------------'
 
-    # print stretch_lines.shape
-    # k = 0
-    # toto=np.empty((stretch_lines.shape[0]*stretch_lines.shape[1],2))
-    # tata = initpts * 0
-    # for i in xrange(stretch_lines.shape[0]):
-    #     for j in xrange(stretch_lines.shape[1]):
-    #         toto[k,:] = stretch_lines[i,:,k]
-    #         k+=1
-    plt.subplot(231)
-    # f, (ax1, ax2) = plt.subplots(2, 1, sharey=True)
-    # plt.imshow(initpts)
-    # plt.imshow(initpts0)
+
     magU = np.sqrt(vel[:, :, 14, 0, 0] ** 2 + vel[:, :, 14, 1, 0] ** 2 + vel[:, :, 14, 2, 0] ** 2)
+
+    plt.subplot(321)
+    plt.imshow(magU)
+    for j in xrange(strain_lines.shape[0]):
+        plt.plot(strain_lines[:, 1, :], strain_lines[:, 0, :], 'k.', ms=1)
+    plt.colorbar()
+    plt.title('strain_lines, (eiv 3)')
+
+    plt.subplot(322)
     plt.imshow(magU)
     for i in xrange(stretch_lines.shape[0]):
-        plt.plot(stretch_lines[i, 1, :], stretch_lines[i, 0, :], 'k-', ms=1)
+        plt.plot(stretch_lines[i, 1, :], stretch_lines[i, 0, :], 'k.', ms=1)
+    plt.colorbar()
+    plt.title('strain_lines, (eiv 1)')
 
-    plt.subplot(232)
-    plt.imshow(magU)
-    for j in xrange(strain_lines.shape[0]):
-        plt.plot(strain_lines[17, 1, :], strain_lines[17, 0, :], 'ro-', ms=1)
 
-    plt.subplot(233)
+
+    plt.subplot(323)
     plt.imshow(vel[:, :, 14, 0, 0])
+    plt.colorbar()
 
-    plt.subplot(234)
+    plt.subplot(324)
     plt.imshow(vel[:, :, 14, 1, 0])
+    plt.colorbar()
 
-    plt.subplot(235)
-    plt.imshow(magU)
-    for j in xrange(strain_lines.shape[0]):
-        plt.plot(ellipticp_lines[17, 1, :], strain_lines[17, 0, :], 'ro-', ms=1)
+    plt.subplot(325)
+    plt.imshow((initpts3))
+    plt.colorbar()
+    plt.title('initpts3')
 
-    plt.subplot(236)
-    plt.imshow(magU)
-    for j in xrange(strain_lines.shape[0]):
-        plt.plot(ellipticm_lines[17, 1, :], strain_lines[17, 0, :], 'ro-', ms=1)
+    plt.subplot(326)
+    plt.imshow((initpts1))
+    plt.colorbar()
+    plt.title('initpts1')
+
+
+
+
+
+    # plt.subplot(235)
+    # plt.imshow(magU)
+    # for j in xrange(strain_lines.shape[0]):
+    #     plt.plot(ellipticp_lines[17, 1, :], strain_lines[17, 0, :], 'ro-', ms=1)
+    #
+    # plt.subplot(236)
+    # plt.imshow(magU)
+    # for j in xrange(strain_lines.shape[0]):
+    #     plt.plot(ellipticm_lines[17, 1, :], strain_lines[17, 0, :], 'ro-', ms=1)
 
     plt.show()

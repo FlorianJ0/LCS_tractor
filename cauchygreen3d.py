@@ -43,9 +43,9 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     rrk45 = 2  # 0=rk45, 1=heun, 2= euler
 
     # small (so is your dick) vector d1(d1 0 0) d2(0 d2 0) d3(0 0 d3)
-    d1 = 0.1
-    d2 = 0.1
-    d3 = 0.1
+    d1 = 0.3
+    d2 = 0.3
+    d3 = 0.3
 
     # tranche = zplan  # index de la tranche evaluee
     integ = 'rk45'
@@ -444,7 +444,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     # ax3.quiver(X, Y, U, V, color=magu)
     # ax4.streamplot(X, Y, uu, vv, density=0.6, color='k', linewidth=magx)
 
-    plt.show()
+    plt.draw()
 
     print '-------------------------'
     print 'error', np.random.random_integers(0, 100)
