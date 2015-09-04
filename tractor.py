@@ -83,8 +83,8 @@ z = float(z)
 dim = 2
 
 
-eigval1, eigval3, eigvec1, eigvec3, interpU_i = cauchygreen3d.cgstki3(vel, z, tphys, dt, nx, ny, nz, 3, domain, simtstep)
-barriers.barrier_type(0, eigval1, eigval3, eigvec1, eigvec3, interpU_i, tphys, dt, nx, ny, nz, domain, simtstep)
+eigval1, eigval3, eigvec1, eigvec3, interpU_i, bobol = cauchygreen3d.cgstki3(vel, z, tphys, dt, nx, ny, nz, 3, domain, simtstep)
+barriers.barrier_type(0, eigval1, eigval3, eigvec1, eigvec3, interpU_i, tphys, dt, nx, ny, nz, domain, simtstep, bobol)
 print '-----------------------------------------------------'
 print 'full total time  in %f s ' % (time.time() - ttot)
 print '-----------------------------------------------------'

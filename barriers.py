@@ -11,7 +11,8 @@ from airkaeffe import heun
 def rpog():
     print("# "),
 
-def helic(vect, dx, dy, dz, eps0):
+
+def helic(vect, dx, dy, dz, eps0, bobol):
     print 'vect shape', vect.shape
     nx = vect.shape[0]
     ny = vect.shape[1]
@@ -21,12 +22,15 @@ def helic(vect, dx, dy, dz, eps0):
     # at each point, 3d grad vector of 3D eigenc
     for i in xrange(nx):
         for j in xrange(ny):
-            # dd[i, j, :] = np.gradient(vect[i, j, :])
-            ddd[i, j] = np.dot(vect[i, j, :], np.gradient(vect[i, j, :]))
-            # if abs(ddd[i,j])<eps0:
-            #     ddd[i,j]=True
-            # else
-            #     ddd[i,j]=False
+            if bobol[i, j]:
+                # dd[i, j, :] = np.gradient(vect[i, j, :])
+                ddd[i, j] = np.dot(vect[i, j, :], np.gradient(vect[i, j, :]))
+            else:
+                ddd[i, j] = 0
+                # if abs(ddd[i,j])<eps0:
+                #     ddd[i,j]=True
+                # else
+                #     ddd[i,j]=False
 
     a = abs(ddd) < eps0
     ddd *= a
@@ -34,7 +38,7 @@ def helic(vect, dx, dy, dz, eps0):
     return ddd
 
 
-def reduced_lines(vect, nx, ny, nz, initpts, thresh, n):
+def reduced_lines(vect, nx, ny, nz, initpts, thresh, n, bobol):
     x = np.arange(0, nx, 1)
     y = np.arange(0, ny, 1)
     vecti = (vect[:, :, 0])
@@ -51,13 +55,13 @@ def reduced_lines(vect, nx, ny, nz, initpts, thresh, n):
 
 
     def gamma(x, t):
-        newpos = np.empty((2))
+        newpos = np.empty(2)
         # print 'x', x
         a = np.array([vi(x[0], x[1]), vj(x[0], x[1])])
         cond = np.dot(a, np.gradient(a))
         cut = False
         # if (1e-4 < abs(cond) < thresh):
-        if (abs(cond) < thresh):
+        if abs(cond) < thresh and bobol[x[0], x[1]]:
             # i did the maths, must be right
             newpos[0] = - 1. * vj(x[0], x[1])
             newpos[1] = 1. * vi(x[0], x[1])
@@ -67,7 +71,7 @@ def reduced_lines(vect, nx, ny, nz, initpts, thresh, n):
         return newpos, cut
 
     print 'integrate reduced LCSs'
-    N = n * 2
+    N = n * 1/2
     # on suppose qu on est toujours normal  a z
     # norm vect = 0 0 -1
     # donc n vectproduct k = kj -ki 0
@@ -78,7 +82,7 @@ def reduced_lines(vect, nx, ny, nz, initpts, thresh, n):
     for i in xrange(initpts.shape[1]):
         y0 = initpts[:, i] * 1.
         line[i, :, :] = heun(gamma, y0, t, nx, ny).swapaxes(1, 0)
-        print 'line number %i' % i
+        # print 'line number %i' % i
         # print y0
         # print line[i, :, -1]
         # print np.sqrt((np.abs(y0[0]-line[i, 0, -1]))**2+(np.abs(y0[1]-line[i, 1, -1]))**2)
@@ -87,13 +91,13 @@ def reduced_lines(vect, nx, ny, nz, initpts, thresh, n):
         # np.savetxt(fname, line[i,:,:])
         a = 1. * i / initpts.shape[1]
         if (100 * a) % 10 < 1e-1:
-                    rpog()
+            rpog()
 
     print '\n'
     return line
 
 
-def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, ny, nz, domain, simtstep):
+def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, ny, nz, domain, simtstep, bobol):
     dx = abs(domain[1] - domain[0]) / nx
     dy = abs(domain[3] - domain[2]) / ny
     dz = abs(domain[5] - domain[4]) / ny
@@ -104,60 +108,111 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     # print eigvec.shape
     # print eigvecm.shape
     stamp = time.time()
-    initpts3 = helic(eigvec3, dx, dy, dz, 0.005)
+    initpts3 = helic(eigvec3, dx, dy, dz, 0.01, bobol)
     seeds3 = np.array([initpts3.nonzero()[0], initpts3.nonzero()[1]])
-    strain_lines = reduced_lines(eigvec3, nx, ny, nz, seeds3, 25,300)
+    strain_lines = reduced_lines(eigvec3, nx, ny, nz, seeds3, 25, 500, bobol)
+    print "number of seeds %i" % seeds3.shape[1]
     print '-----------------------------------------------------'
     print 'strain lines (repelling) computed  in %f s ' % (time.time() - stamp)
     print '-----------------------------------------------------'
 
     stamp = time.time()
-    initpts1 = helic(eigvec1, dx, dy, dz, 0.05)
+    initpts1 = helic(eigvec1, dx, dy, dz, 0.03, bobol)
     seeds1 = np.array([initpts1.nonzero()[0], initpts1.nonzero()[1]])
-    stretch_lines = reduced_lines(eigvec1, nx, ny, nz, seeds1, 4,5)
+    stretch_lines = reduced_lines(eigvec1, nx, ny, nz, seeds1, 10, 500, bobol)
+    print 'number of seeds %i' % seeds1.shape[1]
     print '-----------------------------------------------------'
     print 'stretch (attracting) lines computed  in %f s ' % (time.time() - stamp)
     print '-----------------------------------------------------'
 
+    print eigval1.shape
+    print eigvec1.shape
+    a = np.sqrt(np.sqrt(eigval1))/(np.sqrt(eigval1)+np.sqrt(eigval3))
+    b = np.sqrt(np.sqrt(eigval3))/(np.sqrt(eigval1)+np.sqrt(eigval3))
+    nnp = np.empty((nx, ny, 3))
+    nnm = np.empty((nx, ny, 3))
+    print a.shape, nnp.shape
+    for i in range(3):
+        nnp[:,:,i] = a * eigvec1[:,:,i] + b * eigvec3[:,:,i]
+        nnm[:,:,i] = a * eigvec1[:,:,i] - b * eigvec3[:,:,i]
 
-    ftle = (1/0.16)*np.log(np.sqrt(eigval3+1e-8))
-    magU = np.sqrt(vel[:, :, 14, 0, 0] ** 2 + vel[:, :, 14, 1, 0] ** 2 + vel[:, :, 14, 2, 0] ** 2)
 
-    plt.subplot(321)
+    stamp = time.time()
+    initptsp = helic(nnp, dx, dy, dz, 0.005, bobol)
+    seedsp = np.array([initptsp.nonzero()[0], initptsp.nonzero()[1]])
+    ellipticp = reduced_lines(nnp, nx, ny, nz, seedsp, 10, 500, bobol)
+    print 'number of seeds %i' % seedsp.shape[1]
+    print '-----------------------------------------------------'
+    print 'ellipticp lines computed  in %f s ' % (time.time() - stamp)
+    print '-----------------------------------------------------'
+
+
+
+    stamp = time.time()
+    initptsm = helic(nnm, dx, dy, dz, 0.005, bobol)
+    seedsm = np.array([initptsm.nonzero()[0], initptsm.nonzero()[1]])
+    ellipticm = reduced_lines(nnm, nx, ny, nz, seedsm, 10, 500, bobol)
+    print 'number of seeds %i' % seedsm.shape[1]
+    print '-----------------------------------------------------'
+    print 'ellipticp lines computed  in %f s ' % (time.time() - stamp)
+    print '-----------------------------------------------------'
+
+
+
+
+
+
+    ftle = (1 / 0.16) * np.log(np.sqrt(eigval3 + 1e-8))
+    magU = np.sqrt(vel[:, :, 7, 0, 0] ** 2 + vel[:, :, 7, 1, 0] ** 2 + vel[:, :, 7, 2, 0] ** 2)
+
+    plt.subplot(221)
     # eigval3 /=np.max(np.abs(eigval3-100))
     # eigval1 /=np.max(np.abs(eigval1))
-    plt.imshow(eigval3)
+    plt.imshow(magU)
     for j in xrange(strain_lines.shape[0]):
         plt.plot(strain_lines[:, 1, :], strain_lines[:, 0, :], 'w.', ms=1)
     plt.colorbar()
     plt.title('strain_lines, (eiv 3)')
 
-    plt.subplot(322)
-    plt.imshow(eigval1)
+    plt.subplot(222)
+    plt.imshow(magU)
     for i in xrange(stretch_lines.shape[0]):
         plt.plot(stretch_lines[i, 1, :], stretch_lines[i, 0, :], 'w.', ms=1)
     plt.colorbar()
     plt.title('strain_lines, (eiv 1)')
 
-
-
-    plt.subplot(323)
-    plt.imshow(vel[:, :, 14, 0, 0])
+    plt.subplot(223)
+    plt.imshow(magU)
+    for i in xrange(ellipticp.shape[0]):
+        plt.plot(ellipticp[i, 1, :], ellipticp[i, 0, :], 'b-', ms=1)
     plt.colorbar()
+    plt.title('ellipticp')
 
-    plt.subplot(324)
-    plt.imshow(vel[:, :, 14, 1, 0])
+    plt.subplot(224)
+    plt.imshow(magU)
+    for i in xrange(ellipticm.shape[0]):
+        plt.plot(ellipticm[i, 1, :], ellipticm[i, 0, :], 'b-', ms=1)
     plt.colorbar()
+    plt.title('ellipticm')
 
-    plt.subplot(325)
-    plt.imshow((initpts3))
-    plt.colorbar()
-    plt.title('initpts3')
-
-    plt.subplot(326)
-    plt.imshow(ftle, vmin=0, vmax=8, cmap='jet')
-    plt.colorbar()
-    plt.title('ftle')
+    #
+    # plt.subplot(323)
+    # plt.imshow(vel[:, :, 14, 0, 0])
+    # plt.colorbar()
+    #
+    # plt.subplot(324)
+    # plt.imshow(vel[:, :, 14, 1, 0])
+    # plt.colorbar()
+    #
+    # plt.subplot(325)
+    # plt.imshow((initpts3))
+    # plt.colorbar()
+    # plt.title('initpts3')
+    #
+    # plt.subplot(326)
+    # plt.imshow(ftle, vmin=0, vmax=8, cmap='jet')
+    # plt.colorbar()
+    # plt.title('ftle')
 
 
 

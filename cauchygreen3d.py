@@ -124,6 +124,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     x = np.arange(0, nnx, 1)
     y = np.arange(0, nny, 1)
     z = np.arange(0, nnz, 1)
+    # bobol = velp
 
     velpu = velp[:, :, :, 0, :]
     velpv = velp[:, :, :, 1, :]
@@ -159,6 +160,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     solver = ode(f_u)
     solver.set_integrator('dopri5', rtol=0.001, atol=1e-3)
     t = np.linspace(0, tt, N)
+    bobol = np.zeros((nnx, nny))
     if rrk45 == 0:
         print 'rk45, a checker'
         toto = 0
@@ -168,6 +170,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                 y0 = grid_iini[:, i, j, tranche]
                 # if np.all(np.abs(f_u(grid_i[:, i, j, tranche],0)) > np.array([1e-7,1e-7,1e-7])):
                 if np.all(np.abs(velp[i, j, tranche, :]) > np.array([1e-7, 1e-7, 1e-7])):
+                    bobol[i, j] = True
                     grid_i[:, i, j, tranche], err = rk45(f_u, y0, t)[-1]
                     if np.max(err) > 1e-5:
                         print err, 'erreur d integ trop grande, my nigga'
@@ -185,6 +188,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                 for k in range(tranche - 2, tranche + 3):
                     y0 = grid_iini[:, i, j, k]
                     if np.all(np.abs(velp[i, j, k, :, 0]) > np.array([1e-7, 1e-7, 1e-7])):
+                        bobol[i, j] = True
                         grid_i[:, i, j, k] = heun(f_u, y0, t)[-1]
                     else:
                         grid_i[:, i, j, k] = [0, 0, 0]
@@ -200,6 +204,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                     y0 = grid_iini[:, i, j, k]
 
                     if np.all(np.abs(velp[i, j, k, :, 0]) > np.array([1e-7, 1e-7, 1e-7])):
+                        bobol[i, j] = True
                         grid_i[:, i, j, k] = euler(f_u, y0, t)[-1]
                     else:
                         # grid_i[:, i, j, k] = [0, 0, 0]
@@ -263,7 +268,8 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
             # 3d version haller ann. rev. fluid 2015
             for i in range(1, nnx - 1):
                 for j in range(1, nny - 1):
-                    if np.all(np.abs(velp[i, j, k, :, 0]) > np.array([1e-7, 1e-7, 1e-7])):
+                    # if np.all(np.abs(velp[i, j, k, :, 0]) > np.array([1e-7, 1e-7, 1e-7])):
+                    if bobol[i, j]:
 
                         dphi[i, j, 0, 0] = (du.ip(list(np.array([i + d1, j, tranche]))) - du.ip(
                             list(np.array([i - d1, j, tranche])))) / (2 * d1)
@@ -454,5 +460,5 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     print '-------------------------'
     print 'error', np.random.random_integers(0, 100)
     print '-------------------------'
-    return eigval1, eigval3, eigvec1, eigvec3, interpU_i
+    return eigval1, eigval3, eigvec1, eigvec3, interpU_i, bobol
     # return
