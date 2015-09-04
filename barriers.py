@@ -186,7 +186,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     for i in xrange(ellipticp.shape[0]):
         plt.plot(ellipticp[i, 1, :], ellipticp[i, 0, :], 'b-', ms=1)
     plt.colorbar()
-    plt.title('ellipticp')
+    plt.title('ellipticp ')
 
     plt.subplot(224)
     plt.imshow(magU)
