@@ -142,11 +142,15 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     # eq dif => x point = v(x,t)
     # ou: y point = f(x,t)
     # fonction f:
+    nn=np.array([nnx, nny, nnz])
     def f_u(yy, t):
-        if yy[2] < 0:
-            yy[2] = 0
-        if yy[2] > nnz:
-            yy[2] = nnz
+        for i in xrange(3):
+            yy[i] = yy[i] if yy[i]>3 else 0.
+            yy[i] = yy[i] if yy[i]<(nn[i]-3) else 0.
+        # if yy[2] < 3:
+        #     yy[2] = 3
+        # if yy[2] > nnz-3:
+        #     yy[2] = nnz-3
         a = np.array(
             [fu(yy[0], yy[1], yy[2], t) / ddx, fv(yy[0], yy[1], yy[2], t) / ddy, fw(yy[0], yy[1], yy[2], t) / ddz])
         return a
@@ -407,6 +411,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                 eigval3[i, j] = np.max(eigenValues[i, j, :])
                 eigvec1[i, j, :] = eigenVectors[i, j, :, np.argmin(eigenValues[i, j, :])]
                 eigvec3[i, j, :] = eigenVectors[i, j, :, np.argmax(eigenValues[i, j, :])]
+                # print eigvec3[i, j, :]
 
         print '-----------------------------------------------------'
         print 'Flow map and eigval/eigvec computed in %f s ' % (time.time() - stamp)

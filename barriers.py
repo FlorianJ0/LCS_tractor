@@ -38,7 +38,9 @@ def reduced_lines(vect, nx, ny, nz, initpts, thresh, n):
     x = np.arange(0, nx, 1)
     y = np.arange(0, ny, 1)
     vecti = (vect[:, :, 0])
+    # vecti /=np.max(np.abs(vecti))
     vectj = (vect[:, :, 1])
+    # vectj /=np.max(np.abs(vectj))
 
     # vectj = vect[:,:,1]
     axes = (x, y)
@@ -61,11 +63,11 @@ def reduced_lines(vect, nx, ny, nz, initpts, thresh, n):
             newpos[1] = 1. * vi(x[0], x[1])
         else:
             cut = True
-
+        # print newpos
         return newpos, cut
 
     print 'integrate reduced LCSs'
-    N = n * 0.2
+    N = n * 2
     # on suppose qu on est toujours normal  a z
     # norm vect = 0 0 -1
     # donc n vectproduct k = kj -ki 0
@@ -79,6 +81,7 @@ def reduced_lines(vect, nx, ny, nz, initpts, thresh, n):
         print 'line number %i' % i
         # print y0
         # print line[i, :, -1]
+        # print np.sqrt((np.abs(y0[0]-line[i, 0, -1]))**2+(np.abs(y0[1]-line[i, 1, -1]))**2)
         # print line.shape
         # fname = 'toto' + str(i)
         # np.savetxt(fname, line[i,:,:])
@@ -103,7 +106,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     stamp = time.time()
     initpts3 = helic(eigvec3, dx, dy, dz, 0.005)
     seeds3 = np.array([initpts3.nonzero()[0], initpts3.nonzero()[1]])
-    strain_lines = reduced_lines(eigvec3, nx, ny, nz, seeds3, 75,500)
+    strain_lines = reduced_lines(eigvec3, nx, ny, nz, seeds3, 25,300)
     print '-----------------------------------------------------'
     print 'strain lines (repelling) computed  in %f s ' % (time.time() - stamp)
     print '-----------------------------------------------------'
@@ -121,6 +124,8 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     magU = np.sqrt(vel[:, :, 14, 0, 0] ** 2 + vel[:, :, 14, 1, 0] ** 2 + vel[:, :, 14, 2, 0] ** 2)
 
     plt.subplot(321)
+    # eigval3 /=np.max(np.abs(eigval3-100))
+    # eigval1 /=np.max(np.abs(eigval1))
     plt.imshow(eigval3)
     for j in xrange(strain_lines.shape[0]):
         plt.plot(strain_lines[:, 1, :], strain_lines[:, 0, :], 'w.', ms=1)
@@ -150,7 +155,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     plt.title('initpts3')
 
     plt.subplot(326)
-    plt.imshow(ftle, vmin=0, vmax=8, cmap='jet', aspect='auto')
+    plt.imshow(ftle, vmin=0, vmax=8, cmap='jet')
     plt.colorbar()
     plt.title('ftle')
 

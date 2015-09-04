@@ -16,6 +16,7 @@ import gyronator
 import readUvtk_unstructured
 import sup3D
 
+ttot = time.time()
 Config = ConfigParser.ConfigParser()
 Config.read('parameters.ini')
 
@@ -45,7 +46,7 @@ print 'Goord morning %s' %sup3D.hello()
 print 'Welcome in my lair.'
 print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 stamp = time.time()
-struct = 'struct'
+struct = ConfigSectionMap('filereading')['datastruct']
 if struct=='unstruct':
     extend=np.array([0.05,0.15,0.04,0.14,0.2,0.3])
     dim=np.array([20,20,20])
@@ -75,7 +76,8 @@ a partir des points de G1, calcul de gammaS1 d'apres conditions (voir h2)
 """
 
 # compute CG-strain tensor + eig/eiv on z plane
-z = 0.21
+z = ConfigSectionMap('cauchygreen')['z']
+z = float(z)
 # t = 3
 # calcul sur un plan x y parceque jsuis trop une feignasse pour un code generique
 dim = 2
@@ -83,4 +85,7 @@ dim = 2
 
 eigval1, eigval3, eigvec1, eigvec3, interpU_i = cauchygreen3d.cgstki3(vel, z, tphys, dt, nx, ny, nz, 3, domain, simtstep)
 barriers.barrier_type(0, eigval1, eigval3, eigvec1, eigvec3, interpU_i, tphys, dt, nx, ny, nz, domain, simtstep)
+print '-----------------------------------------------------'
+print 'full total time  in %f s ' % (time.time() - ttot)
+print '-----------------------------------------------------'
 # barriers.barrier_type(0, eigval, eigvec, tphys, dt, nx, ny, domain, simtstep)

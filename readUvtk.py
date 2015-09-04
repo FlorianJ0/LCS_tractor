@@ -45,7 +45,8 @@ def read_files(loc):
 
         print 'file:', i
         print 'dim:', dim
-        arrowglyph = data.GetCellData().GetArray('U')
+        arrowglyph = data.GetCellData().GetArray('internalMesh/U')
+        # print data.GetCellData()
         vectU = vn.vtk_to_numpy(arrowglyph)
         # vectU[vectU < -20] = 'NaN'
         # if np.all(vectU) < np.array([1e-8,1e-8,1e-8])):
@@ -66,7 +67,7 @@ def read_files(loc):
         print count
         # U=np.flipud(U)
         count += 1
-    dt = 0.04
+    dt = 0.05
     tphys = count * dt
     print 'tphys = ', tphys
     print 'Files read'
