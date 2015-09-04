@@ -7,6 +7,7 @@ __date__ = '30 Juillet 2015'
 #
 import numpy as np
 import time
+import ConfigParser
 
 import readUvtk
 import barriers
@@ -15,20 +16,34 @@ import gyronator
 import readUvtk_unstructured
 import sup3D
 
+Config = ConfigParser.ConfigParser()
+Config.read('parameters.ini')
+
+def ConfigSectionMap(section):
+    dict1 = {}
+    options = Config.options(section)
+    for option in options:
+        try:
+            dict1[option] = Config.get(section, option)
+            if dict1[option] == -1:
+                DebugPrint("skip: %s" % option)
+        except:
+            print("exception on %s!" % option)
+            dict1[option] = None
+    return dict1
 
 # vitesse min pour savoir si on est in/out domain (a mettre a -100 pour la suite)
-outofdomain = 1E-16
-instat = True
+outofdomain = ConfigSectionMap('filereading')['outofdomain']
+# instat = True
 # t step de la simu
-simtstep = 0.04
+simtstep = ConfigSectionMap('filereading')['timestep']
 # read file/s
-loc = '/home/p0054421/MEGA/calcul/LCS_tractor/data'
+loc =  ConfigSectionMap('filereading')['folder']
 
 print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 print 'Goord morning %s' %sup3D.hello()
 print 'Welcome in my lair.'
 print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-loc = '/media/backup/patients_article0/patient4/DOIRE^JEAN-LOUIS/DOIRE^JEAN_LOUIS_20060124/'
 stamp = time.time()
 struct = 'struct'
 if struct=='unstruct':

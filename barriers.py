@@ -34,7 +34,7 @@ def helic(vect, dx, dy, dz, eps0):
     return ddd
 
 
-def reduced_lines(vect, nx, ny, nz, initpts, thresh):
+def reduced_lines(vect, nx, ny, nz, initpts, thresh, n):
     x = np.arange(0, nx, 1)
     y = np.arange(0, ny, 1)
     vecti = (vect[:, :, 0])
@@ -54,7 +54,8 @@ def reduced_lines(vect, nx, ny, nz, initpts, thresh):
         a = np.array([vi(x[0], x[1]), vj(x[0], x[1])])
         cond = np.dot(a, np.gradient(a))
         cut = False
-        if (1e-4 < abs(cond) < thresh):
+        # if (1e-4 < abs(cond) < thresh):
+        if (abs(cond) < thresh):
             # i did the maths, must be right
             newpos[0] = - 1. * vj(x[0], x[1])
             newpos[1] = 1. * vi(x[0], x[1])
@@ -64,18 +65,18 @@ def reduced_lines(vect, nx, ny, nz, initpts, thresh):
         return newpos, cut
 
     print 'integrate reduced LCSs'
-    N = 100
+    N = n * 0.2
     # on suppose qu on est toujours normal  a z
     # norm vect = 0 0 -1
     # donc n vectproduct k = kj -ki 0
     # la trajectoire est portee par le vect kj -ki 0 donc dans le plan
-    t = np.linspace(0, 20, N)  # pseudo integrator
+    t = np.linspace(0, n, N)  # pseudo integrator
     line = np.zeros((initpts.shape[1], 2, N))
     print ('0            50          100%')
     for i in xrange(initpts.shape[1]):
         y0 = initpts[:, i] * 1.
         line[i, :, :] = heun(gamma, y0, t, nx, ny).swapaxes(1, 0)
-        # print 'line number %i' % i
+        print 'line number %i' % i
         # print y0
         # print line[i, :, -1]
         # print line.shape
@@ -102,7 +103,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     stamp = time.time()
     initpts3 = helic(eigvec3, dx, dy, dz, 0.005)
     seeds3 = np.array([initpts3.nonzero()[0], initpts3.nonzero()[1]])
-    strain_lines = reduced_lines(eigvec3, nx, ny, nz, seeds3, 1)
+    strain_lines = reduced_lines(eigvec3, nx, ny, nz, seeds3, 75,500)
     print '-----------------------------------------------------'
     print 'strain lines (repelling) computed  in %f s ' % (time.time() - stamp)
     print '-----------------------------------------------------'
@@ -110,7 +111,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     stamp = time.time()
     initpts1 = helic(eigvec1, dx, dy, dz, 0.05)
     seeds1 = np.array([initpts1.nonzero()[0], initpts1.nonzero()[1]])
-    stretch_lines = reduced_lines(eigvec1, nx, ny, nz, seeds1, 4)
+    stretch_lines = reduced_lines(eigvec1, nx, ny, nz, seeds1, 4,5)
     print '-----------------------------------------------------'
     print 'stretch (attracting) lines computed  in %f s ' % (time.time() - stamp)
     print '-----------------------------------------------------'
@@ -122,14 +123,14 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     plt.subplot(321)
     plt.imshow(eigval3)
     for j in xrange(strain_lines.shape[0]):
-        plt.plot(strain_lines[:, 1, :], strain_lines[:, 0, :], 'w-', ms=1)
+        plt.plot(strain_lines[:, 1, :], strain_lines[:, 0, :], 'w.', ms=1)
     plt.colorbar()
     plt.title('strain_lines, (eiv 3)')
 
     plt.subplot(322)
     plt.imshow(eigval1)
     for i in xrange(stretch_lines.shape[0]):
-        plt.plot(stretch_lines[i, 1, :], stretch_lines[i, 0, :], 'w-', ms=1)
+        plt.plot(stretch_lines[i, 1, :], stretch_lines[i, 0, :], 'w.', ms=1)
     plt.colorbar()
     plt.title('strain_lines, (eiv 1)')
 

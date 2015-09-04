@@ -157,6 +157,7 @@ def heun(f, x0, t, nx, ny):
     for i in xrange(n - 1):
         if f(x[i], t[i])[1]:
             x[i + 1] = x[i]
+            print 'cut'
             break
         elif x[i][0] > (nx-2) or x[i][0] < 2 or x[i][1] > (ny-2) or x[i][1]<2:
             x[i+1] = x[i]
