@@ -8,6 +8,20 @@ from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 from airkaeffe import heun
 
 
+def ConfigSectionMap(section):
+    dict1 = {}
+    options = Config.options(section)
+    for option in options:
+        try:
+            dict1[option] = Config.get(section, option)
+            if dict1[option] == -1:
+                DebugPrint("skip: %s" % option)
+        except:
+            print("exception on %s!" % option)
+            dict1[option] = None
+    return dict1
+
+
 def rpog():
     print("# "),
 
@@ -140,7 +154,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     stamp = time.time()
     initptsp = helic(nnp, dx, dy, dz, 0.005, bobol)
     seedsp = np.array([initptsp.nonzero()[0], initptsp.nonzero()[1]])
-    ellipticp = reduced_lines(nnp, nx, ny, nz, seedsp, 10, 500, bobol)
+    ellipticp = reduced_lines(nnp, nx, ny, nz, seedsp, 1e-2, 500, bobol)
     print 'number of seeds %i' % seedsp.shape[1]
     print '-----------------------------------------------------'
     print 'ellipticp lines computed  in %f s ' % (time.time() - stamp)
@@ -151,7 +165,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     stamp = time.time()
     initptsm = helic(nnm, dx, dy, dz, 0.005, bobol)
     seedsm = np.array([initptsm.nonzero()[0], initptsm.nonzero()[1]])
-    ellipticm = reduced_lines(nnm, nx, ny, nz, seedsm, 10, 500, bobol)
+    ellipticm = reduced_lines(nnm, nx, ny, nz, seedsm, 1e-2, 500, bobol)
     print 'number of seeds %i' % seedsm.shape[1]
     print '-----------------------------------------------------'
     print 'ellipticp lines computed  in %f s ' % (time.time() - stamp)
@@ -170,28 +184,28 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     # eigval1 /=np.max(np.abs(eigval1))
     plt.imshow(magU)
     for j in xrange(strain_lines.shape[0]):
-        plt.plot(strain_lines[:, 1, :], strain_lines[:, 0, :], 'w.', ms=1)
+        plt.plot(strain_lines[:, 1, :], strain_lines[:, 0, :], 'k.', ms=1)
     plt.colorbar()
     plt.title('strain_lines, (eiv 3)')
 
     plt.subplot(222)
     plt.imshow(magU)
     for i in xrange(stretch_lines.shape[0]):
-        plt.plot(stretch_lines[i, 1, :], stretch_lines[i, 0, :], 'w.', ms=1)
+        plt.plot(stretch_lines[i, 1, :], stretch_lines[i, 0, :], 'k.', ms=1)
     plt.colorbar()
     plt.title('strain_lines, (eiv 1)')
 
     plt.subplot(223)
     plt.imshow(magU)
     for i in xrange(ellipticp.shape[0]):
-        plt.plot(ellipticp[i, 1, :], ellipticp[i, 0, :], 'b-', ms=1)
+        plt.plot(ellipticp[i, 1, :], ellipticp[i, 0, :], 'k.', ms=1)
     plt.colorbar()
     plt.title('ellipticp ')
 
     plt.subplot(224)
     plt.imshow(magU)
     for i in xrange(ellipticm.shape[0]):
-        plt.plot(ellipticm[i, 1, :], ellipticm[i, 0, :], 'b-', ms=1)
+        plt.plot(ellipticm[i, 1, :], ellipticm[i, 0, :], 'k.', ms=1)
     plt.colorbar()
     plt.title('ellipticm')
 
