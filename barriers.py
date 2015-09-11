@@ -124,7 +124,8 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     stamp = time.time()
     initpts3 = helic(eigvec3, dx, dy, dz, 0.01, bobol)
     seeds3 = np.array([initpts3.nonzero()[0], initpts3.nonzero()[1]])
-    strain_lines = reduced_lines(eigvec3, nx, ny, nz, seeds3, 25, 500, bobol)
+    print seeds3.shape
+    strain_lines = reduced_lines(eigvec3, nx, ny, nz, seeds3, 5, 500, bobol)
     print "number of seeds %i" % seeds3.shape[1]
     print '-----------------------------------------------------'
     print 'strain lines (repelling) computed  in %f s ' % (time.time() - stamp)
@@ -133,7 +134,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     stamp = time.time()
     initpts1 = helic(eigvec1, dx, dy, dz, 0.03, bobol)
     seeds1 = np.array([initpts1.nonzero()[0], initpts1.nonzero()[1]])
-    stretch_lines = reduced_lines(eigvec1, nx, ny, nz, seeds1, 10, 500, bobol)
+    stretch_lines = reduced_lines(eigvec1, nx, ny, nz, seeds1, 5, 500, bobol)
     print 'number of seeds %i' % seeds1.shape[1]
     print '-----------------------------------------------------'
     print 'stretch (attracting) lines computed  in %f s ' % (time.time() - stamp)
@@ -165,7 +166,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     stamp = time.time()
     initptsm = helic(nnm, dx, dy, dz, 0.005, bobol)
     seedsm = np.array([initptsm.nonzero()[0], initptsm.nonzero()[1]])
-    ellipticm = reduced_lines(nnm, nx, ny, nz, seedsm, 1e-2, 500, bobol)
+    ellipticm = reduced_lines(nnm, nx, ny, nz, seedsm, 1e-1, 500, bobol)
     print 'number of seeds %i' % seedsm.shape[1]
     print '-----------------------------------------------------'
     print 'ellipticp lines computed  in %f s ' % (time.time() - stamp)
