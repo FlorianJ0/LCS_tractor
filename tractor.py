@@ -53,7 +53,6 @@ if struct=='unstruct':
     vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk_unstructured.read_files(loc, dim, extend)
     quit()
 elif struct=='struct':
-
     vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk.read_files(loc)
 elif struct=='anal':
     vel, nx, ny, nz, dim_initial, tphys, dt, domain = gyronator.gyro()

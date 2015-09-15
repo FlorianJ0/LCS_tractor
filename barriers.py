@@ -93,7 +93,7 @@ def reduced_lines(vect, nx, ny, nz, initpts, thresh, n, bobol):
         return newpos, cut
 
     print 'integrate reduced LCSs'
-    N = n * 1/0.1
+    N = n * 1/0.01
     # on suppose qu on est toujours normal  a z
     # norm vect = 0 0 -1
     # donc n vectproduct k = kj -ki 0
@@ -123,7 +123,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     dx = abs(domain[1] - domain[0]) / nx
     dy = abs(domain[3] - domain[2]) / ny
     dz = abs(domain[5] - domain[4]) / ny
-    print 'hyperbolic  LCS'
+    # print 'hyperbolic  LCS'
     # cond helicity
     # H = np.dot(eigvec[0],np.cross(np.gradient() ))
     # eigvecm = eigvec[:,:,0,:]
@@ -140,23 +140,23 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
         nnm[:,:,i] = a * eigvec1[:,:,i] - b * eigvec3[:,:,i]
 
     #threshhods of seed finding
-    ths_strain_lines = ConfigSectionMap('barriers')['ths_strain_lines']
-    ths_stretch_lines = ConfigSectionMap('barriers')['ths_stretch_lines']
-    ths_ellipticp_lines = ConfigSectionMap('barriers')['ths_ellipticp_lines']
-    ths_ellipticm_lines = ConfigSectionMap('barriers')['ths_ellipticn_lines']
+    ths_strain_lines = np.float(ConfigSectionMap('barriers')['ths_strain_lines'])
+    ths_stretch_lines = np.float(ConfigSectionMap('barriers')['ths_stretch_lines'])
+    ths_ellipticp_lines = np.float(ConfigSectionMap('barriers')['ths_ellipticp_lines'])
+    ths_ellipticm_lines = np.float(ConfigSectionMap('barriers')['ths_ellipticn_lines'])
 
     #threshhods of line integration
-    th_strain_lines = ConfigSectionMap('barriers')['th_strain_lines']
-    th_stretch_lines = ConfigSectionMap('barriers')['th_stretch_lines']
-    th_ellipticp_lines = ConfigSectionMap('barriers')['th_ellipticp_lines']
-    th_ellipticn_lines = ConfigSectionMap('barriers')['th_ellipticn_lines']
+    th_strain_lines = np.float(ConfigSectionMap('barriers')['th_strain_lines'])
+    th_stretch_lines = np.float(ConfigSectionMap('barriers')['th_stretch_lines'])
+    th_ellipticp_lines = np.float(ConfigSectionMap('barriers')['th_ellipticp_lines'])
+    th_ellipticn_lines = np.float(ConfigSectionMap('barriers')['th_ellipticn_lines'])
 
     stamp = time.time()
     initpts3 = helic(eigvec3, dx, dy, dz, ths_strain_lines, bobol)
     # print initpts3.nonzero()
     seeds3 = np.array([initpts3.nonzero()[0], initpts3.nonzero()[1]])
     print seeds3.shape
-    strain_lines = reduced_lines(eigvec3, nx, ny, nz, seeds3, th_strain_lines, 500, bobol)
+    strain_lines = reduced_lines(eigvec3, nx, ny, nz, seeds3, th_strain_lines, 50, bobol)
     print "number of seeds %i" % seeds3.shape[1]
     print '-----------------------------------------------------'
     print 'strain lines (repelling) computed  in %f s ' % (time.time() - stamp)
@@ -165,7 +165,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     stamp = time.time()
     initpts1 = helic(eigvec1, dx, dy, dz, ths_stretch_lines, bobol)
     seeds1 = np.array([initpts1.nonzero()[0], initpts1.nonzero()[1]])
-    stretch_lines = reduced_lines(eigvec1, nx, ny, nz, seeds1, th_stretch_lines, 500, bobol)
+    stretch_lines = reduced_lines(eigvec1, nx, ny, nz, seeds1, th_stretch_lines, 50, bobol)
     print 'number of seeds %i' % seeds1.shape[1]
     print '-----------------------------------------------------'
     print 'stretch (attracting) lines computed  in %f s ' % (time.time() - stamp)
@@ -174,7 +174,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     stamp = time.time()
     initptsp = helic(nnp, dx, dy, dz, ths_ellipticp_lines, bobol)
     seedsp = np.array([initptsp.nonzero()[0], initptsp.nonzero()[1]])
-    ellipticp = reduced_lines(nnp, nx, ny, nz, seedsp, th_ellipticp_lines, 500, bobol)
+    ellipticp = reduced_lines(nnp, nx, ny, nz, seedsp, th_ellipticp_lines, 50, bobol)
     print 'number of seeds %i' % seedsp.shape[1]
     print '-----------------------------------------------------'
     print 'ellipticp lines computed  in %f s ' % (time.time() - stamp)
@@ -183,7 +183,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     stamp = time.time()
     initptsm = helic(nnm, dx, dy, dz, ths_ellipticm_lines, bobol)
     seedsm = np.array([initptsm.nonzero()[0], initptsm.nonzero()[1]])
-    ellipticm = reduced_lines(nnm, nx, ny, nz, seedsm, th_ellipticn_lines, 500, bobol)
+    ellipticm = reduced_lines(nnm, nx, ny, nz, seedsm, th_ellipticn_lines, 50, bobol)
     print 'number of seeds %i' % seedsm.shape[1]
     print '-----------------------------------------------------'
     print 'ellipticp lines computed  in %f s ' % (time.time() - stamp)
@@ -260,4 +260,5 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     # for j in xrange(strain_lines.shape[0]):
     #     plt.plot(ellipticm_lines[17, 1, :], strain_lines[17, 0, :], 'ro-', ms=1)
 
-    plt.show()
+    plt.draw()
+    return

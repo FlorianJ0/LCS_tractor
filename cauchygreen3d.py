@@ -10,7 +10,6 @@ import time
 # from pygsl import _numobj as numx
 import scipy.version as ver
 from numpy import linalg as LA
-import matplotlib.pyplot as plt
 from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 # from scipy.interpolate import RegularGridInterpolator as IF
 from scipy.integrate import ode
@@ -44,6 +43,7 @@ def ConfigSectionMap(section):
             dict1[option] = None
     return dict1
 
+
 def rpog():
     print("# "),
 
@@ -59,7 +59,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     rrk45 = 2  # 0=rk45, 1=heun, 2= euler
 
     # small (so is your dick) vector d1(d1 0 0) d2(0 d2 0) d3(0 0 d3)
-    d1 = ConfigSectionMap('cauchygreen')['dx']
+    d1 = np.float(ConfigSectionMap('cauchygreen')['dx'])
     d2 = d1
     d3 = d2
 
@@ -159,11 +159,12 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     # eq dif => x point = v(x,t)
     # ou: y point = f(x,t)
     # fonction f:
-    nn=np.array([nnx, nny, nnz])
+    nn = np.array([nnx, nny, nnz])
+
     def f_u(yy, t):
         for i in xrange(3):
-            yy[i] = yy[i] if yy[i]>3 else 0.
-            yy[i] = yy[i] if yy[i]<(nn[i]-3) else 0.
+            yy[i] = yy[i] if yy[i] > 3 else 0.
+            yy[i] = yy[i] if yy[i] < (nn[i] - 3) else 0.
         # if yy[2] < 3:
         #     yy[2] = 3
         # if yy[2] > nnz-3:
@@ -229,7 +230,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
             if (100 * a) % 10 < 1e-3:
                 rpog()
 
-        print '\n %i point skipped, ie. %f percents of total points of the domain' % (toto, 100 * toto / (ny * nx * 5))
+        print '\n %i point skipped, ie. %f percents of total points of the domain' %(toto, 100 * toto / (ny * nx * 5))
     else:
         print 'wut ?'
         quit()
@@ -449,39 +450,39 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         print 'Flow map and eigval/eigvec computed in %f s ' % (time.time() - stamp)
         print '-----------------------------------------------------'
 
-    f, ((ax1, ax2, ax3), (ax4, ax5, ax6), (ax7, ax8, ax9)) = plt.subplots(3, 3, sharex=True, sharey=True)
-    # print didx.shape
-    Y, X = np.mgrid[0:nx * dx:rr * nx * 1j, 0:ny * dy:rr * ny * 1j]
+        # f, ((ax1, ax2, ax3), (ax4, ax5, ax6), (ax7, ax8, ax9)) = plt.subplots(3, 3, sharex=True, sharey=True)
+        # print didx.shape
+        # Y, X = np.mgrid[0:nx * dx:rr * nx * 1j, 0:ny * dy:rr * ny * 1j]
 
-    uu = grid_i[0, :, :, zzplan] - grid_iini[0, :, :, zzplan]  # -grid_iini[0,:,:]
-    vv = grid_i[1, :, :, zzplan] - grid_iini[1, :, :, zzplan]  # -grid_iini[1,:,:]
-    ww = grid_i[2, :, :, zzplan] - grid_iini[2, :, :, zzplan]  # -grid_iini[1,:,:]
-    magx = np.sqrt(uu * uu + vv * vv + ww * ww)
-    U = interpU_i[:, :, 0, 0]
-    V = interpU_i[:, :, 1, 0]
-    magu = np.sqrt(U * U + V * V)
-    # print grid_i[0, 5, :]- grid_iini[0, 5, :]
-    ax4.imshow(velpu[:, :, tranche, 0], vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
-    ax5.imshow(velpv[:, :, tranche, 0], vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
-    ax6.imshow(velpw[:, :, tranche, 0], vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
-    # ax2.imshow(dispu[:,:,tranche-1]-dispu[:,:,tranche+1])
-    # ax3.imshow(dispu[:,:,tranche+1]-grid_iini[0,:,:,tranche+1])
-    # ax3.imshow(grid_i[2, :, :,zzplan])
-    # ax2.imshow(magx)
-    ax1.imshow(grid_i[0, :, :, tranche])
-    ax2.imshow(grid_i[1, :, :, tranche])
-    ax3.imshow(grid_i[2, :, :, tranche])
+        # uu = grid_i[0, :, :, zzplan] - grid_iini[0, :, :, zzplan]  # -grid_iini[0,:,:]
+        # vv = grid_i[1, :, :, zzplan] - grid_iini[1, :, :, zzplan]  # -grid_iini[1,:,:]
+        # ww = grid_i[2, :, :, zzplan] - grid_iini[2, :, :, zzplan]  # -grid_iini[1,:,:]
+        # magx = np.sqrt(uu * uu + vv * vv + ww * ww)
+        # U = interpU_i[:, :, 0, 0]
+        # V = interpU_i[:, :, 1, 0]
+        # magu = np.sqrt(U * U + V * V)
+        # print grid_i[0, 5, :]- grid_iini[0, 5, :]
+        # ax4.imshow(velpu[:, :, tranche, 0], vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
+        # ax5.imshow(velpv[:, :, tranche, 0], vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
+        # ax6.imshow(velpw[:, :, tranche, 0], vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
+        # ax2.imshow(dispu[:,:,tranche-1]-dispu[:,:,tranche+1])
+        # ax3.imshow(dispu[:,:,tranche+1]-grid_iini[0,:,:,tranche+1])
+        # ax3.imshow(grid_i[2, :, :,zzplan])
+        # ax2.imshow(magx)
+        # ax1.imshow(grid_i[0, :, :, tranche])
+        # ax2.imshow(grid_i[1, :, :, tranche])
+        # ax3.imshow(grid_i[2, :, :, tranche])
 
-    ax7.imshow(dphi[:, :, 0, 0])
-    with file('test.txt', 'w') as outfile:
-        np.savetxt(outfile, dphi[:, :, 0, 0])
-    ax8.imshow(dphi[:, :, 0, 1])
-    ax9.imshow(dphi[:, :, 1, 1])
+        # ax7.imshow(dphi[:, :, 0, 0])
+        # with file('test.txt', 'w') as outfile:
+        # np.savetxt(outfile, dphi[:, :, 0, 0])
+    # ax8.imshow(dphi[:, :, 0, 1])
+    # ax9.imshow(dphi[:, :, 1, 1])
     # ax2.imshow(didy)
     # ax3.quiver(X, Y, U, V, color=magu)
     # ax4.streamplot(X, Y, uu, vv, density=0.6, color='k', linewidth=magx)
 
-    plt.draw()
+    # plt.draw()
 
     print '-------------------------'
     print 'error', np.random.random_integers(0, 100)
