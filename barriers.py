@@ -1,11 +1,15 @@
 __author__ = 'p0054421'
 import numpy as np
 import time
+import ConfigParser
 
 import matplotlib.pyplot as plt
 from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 
 from airkaeffe import heun
+
+Config = ConfigParser.ConfigParser()
+Config.read('parameters.ini')
 
 
 def ConfigSectionMap(section):
@@ -45,7 +49,11 @@ def helic(vect, dx, dy, dz, eps0, bobol):
                 #     ddd[i,j]=True
                 # else
                 #     ddd[i,j]=False
-
+    npp = ConfigSectionMap('cauchygreen')['nseeds']
+    print'sort'
+    print ddd.shape
+    # sort = insertion_sort(ddd)[npp]
+    # print sort
     a = abs(ddd) < eps0
     ddd *= a
 
@@ -85,7 +93,7 @@ def reduced_lines(vect, nx, ny, nz, initpts, thresh, n, bobol):
         return newpos, cut
 
     print 'integrate reduced LCSs'
-    N = n * 1/2
+    N = n * 1/0.1
     # on suppose qu on est toujours normal  a z
     # norm vect = 0 0 -1
     # donc n vectproduct k = kj -ki 0
@@ -121,52 +129,61 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     # eigvecm = eigvec[:,:,0,:]
     # print eigvec.shape
     # print eigvecm.shape
+
+    a = np.sqrt(np.sqrt(eigval1))/(np.sqrt(eigval1)+np.sqrt(eigval3))
+    b = np.sqrt(np.sqrt(eigval3))/(np.sqrt(eigval1)+np.sqrt(eigval3))
+    nnp = np.empty((nx, ny, 3))
+    nnm = np.empty((nx, ny, 3))
+    # print a.shape, nnp.shape
+    for i in range(3):
+        nnp[:,:,i] = a * eigvec1[:,:,i] + b * eigvec3[:,:,i]
+        nnm[:,:,i] = a * eigvec1[:,:,i] - b * eigvec3[:,:,i]
+
+    #threshhods of seed finding
+    ths_strain_lines = ConfigSectionMap('barriers')['ths_strain_lines']
+    ths_stretch_lines = ConfigSectionMap('barriers')['ths_stretch_lines']
+    ths_ellipticp_lines = ConfigSectionMap('barriers')['ths_ellipticp_lines']
+    ths_ellipticm_lines = ConfigSectionMap('barriers')['ths_ellipticn_lines']
+
+    #threshhods of line integration
+    th_strain_lines = ConfigSectionMap('barriers')['th_strain_lines']
+    th_stretch_lines = ConfigSectionMap('barriers')['th_stretch_lines']
+    th_ellipticp_lines = ConfigSectionMap('barriers')['th_ellipticp_lines']
+    th_ellipticn_lines = ConfigSectionMap('barriers')['th_ellipticn_lines']
+
     stamp = time.time()
-    initpts3 = helic(eigvec3, dx, dy, dz, 0.01, bobol)
+    initpts3 = helic(eigvec3, dx, dy, dz, ths_strain_lines, bobol)
+    # print initpts3.nonzero()
     seeds3 = np.array([initpts3.nonzero()[0], initpts3.nonzero()[1]])
     print seeds3.shape
-    strain_lines = reduced_lines(eigvec3, nx, ny, nz, seeds3, 5, 500, bobol)
+    strain_lines = reduced_lines(eigvec3, nx, ny, nz, seeds3, th_strain_lines, 500, bobol)
     print "number of seeds %i" % seeds3.shape[1]
     print '-----------------------------------------------------'
     print 'strain lines (repelling) computed  in %f s ' % (time.time() - stamp)
     print '-----------------------------------------------------'
 
     stamp = time.time()
-    initpts1 = helic(eigvec1, dx, dy, dz, 0.03, bobol)
+    initpts1 = helic(eigvec1, dx, dy, dz, ths_stretch_lines, bobol)
     seeds1 = np.array([initpts1.nonzero()[0], initpts1.nonzero()[1]])
-    stretch_lines = reduced_lines(eigvec1, nx, ny, nz, seeds1, 5, 500, bobol)
+    stretch_lines = reduced_lines(eigvec1, nx, ny, nz, seeds1, th_stretch_lines, 500, bobol)
     print 'number of seeds %i' % seeds1.shape[1]
     print '-----------------------------------------------------'
     print 'stretch (attracting) lines computed  in %f s ' % (time.time() - stamp)
     print '-----------------------------------------------------'
 
-    print eigval1.shape
-    print eigvec1.shape
-    a = np.sqrt(np.sqrt(eigval1))/(np.sqrt(eigval1)+np.sqrt(eigval3))
-    b = np.sqrt(np.sqrt(eigval3))/(np.sqrt(eigval1)+np.sqrt(eigval3))
-    nnp = np.empty((nx, ny, 3))
-    nnm = np.empty((nx, ny, 3))
-    print a.shape, nnp.shape
-    for i in range(3):
-        nnp[:,:,i] = a * eigvec1[:,:,i] + b * eigvec3[:,:,i]
-        nnm[:,:,i] = a * eigvec1[:,:,i] - b * eigvec3[:,:,i]
-
-
     stamp = time.time()
-    initptsp = helic(nnp, dx, dy, dz, 0.005, bobol)
+    initptsp = helic(nnp, dx, dy, dz, ths_ellipticp_lines, bobol)
     seedsp = np.array([initptsp.nonzero()[0], initptsp.nonzero()[1]])
-    ellipticp = reduced_lines(nnp, nx, ny, nz, seedsp, 1e-2, 500, bobol)
+    ellipticp = reduced_lines(nnp, nx, ny, nz, seedsp, th_ellipticp_lines, 500, bobol)
     print 'number of seeds %i' % seedsp.shape[1]
     print '-----------------------------------------------------'
     print 'ellipticp lines computed  in %f s ' % (time.time() - stamp)
     print '-----------------------------------------------------'
 
-
-
     stamp = time.time()
-    initptsm = helic(nnm, dx, dy, dz, 0.005, bobol)
+    initptsm = helic(nnm, dx, dy, dz, ths_ellipticm_lines, bobol)
     seedsm = np.array([initptsm.nonzero()[0], initptsm.nonzero()[1]])
-    ellipticm = reduced_lines(nnm, nx, ny, nz, seedsm, 1e-1, 500, bobol)
+    ellipticm = reduced_lines(nnm, nx, ny, nz, seedsm, th_ellipticn_lines, 500, bobol)
     print 'number of seeds %i' % seedsm.shape[1]
     print '-----------------------------------------------------'
     print 'ellipticp lines computed  in %f s ' % (time.time() - stamp)

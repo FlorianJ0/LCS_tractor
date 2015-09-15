@@ -10,7 +10,6 @@ import time
 # from pygsl import _numobj as numx
 import scipy.version as ver
 from numpy import linalg as LA
-
 import matplotlib.pyplot as plt
 from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 # from scipy.interpolate import RegularGridInterpolator as IF
@@ -20,6 +19,7 @@ from airkaeffe import rk45, heun, euler
 
 sys.path.append('pytricubic-master/')
 import tricubic
+import ConfigParser
 
 
 # imp.load_source('pytricubic-master/tricubic.so')
@@ -27,6 +27,22 @@ import tricubic
 # from vtk import *
 
 # noinspection PyPep8Naming
+Config = ConfigParser.ConfigParser()
+Config.read('parameters.ini')
+
+
+def ConfigSectionMap(section):
+    dict1 = {}
+    options = Config.options(section)
+    for option in options:
+        try:
+            dict1[option] = Config.get(section, option)
+            if dict1[option] == -1:
+                DebugPrint("skip: %s" % option)
+        except:
+            print("exception on %s!" % option)
+            dict1[option] = None
+    return dict1
 
 def rpog():
     print("# "),
@@ -43,9 +59,9 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     rrk45 = 2  # 0=rk45, 1=heun, 2= euler
 
     # small (so is your dick) vector d1(d1 0 0) d2(0 d2 0) d3(0 0 d3)
-    d1 = 0.05
-    d2 = 0.05
-    d3 = 0.05
+    d1 = ConfigSectionMap('cauchygreen')['dx']
+    d2 = d1
+    d3 = d2
 
     # tranche = zplan  # index de la tranche evaluee
     integ = 'rk45'
@@ -327,6 +343,8 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                 for j in xrange(nny):
                     gdphi[i, j, :, :] = np.dot(dphi[i, j, :, :].T, dphi[i, j, :, :])
 
+
+
         else:
             quit()
             # axes = (xx, yy, zz)
@@ -418,6 +436,14 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                 eigvec1[i, j, :] = eigenVectors[i, j, :, np.argmin(eigenValues[i, j, :])]
                 eigvec3[i, j, :] = eigenVectors[i, j, :, np.argmax(eigenValues[i, j, :])]
                 # print eigvec3[i, j, :]
+
+        # toto = eigval3.astype(short)
+        # juliaStacked = np.dstack([toto])
+        # x = np.arange(0, nnx)
+        # y = np.arange(0, nny)
+        # z = np.arange(0, 2)
+        # gridToVTK("./julia", x, y, z, cellData = {'julia': juliaStacked})
+
 
         print '-----------------------------------------------------'
         print 'Flow map and eigval/eigvec computed in %f s ' % (time.time() - stamp)
