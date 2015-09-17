@@ -1,7 +1,6 @@
 __author__ = 'p0054421'
 
 
-
 def distanceBetweenCurves(C1, C2):
     D = scipy.spatial.distance.cdist(C1, C2, 'euclidean')
 

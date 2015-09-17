@@ -15,12 +15,9 @@ from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 from scipy.integrate import ode
 import sys
 from airkaeffe import rk45, heun, euler
-
 sys.path.append('pytricubic-master/')
 import tricubic
 import ConfigParser
-
-
 # imp.load_source('pytricubic-master/tricubic.so')
 # import vtk
 # from vtk import *
@@ -160,7 +157,10 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     # ou: y point = f(x,t)
     # fonction f:
     nn = np.array([nnx, nny, nnz])
-
+    invddx = 1/ddx
+    invddy = 1/ddy
+    invddz = 1/ddz
+    # @jit
     def f_u(yy, t):
         for i in xrange(3):
             yy[i] = yy[i] if yy[i] > 3 else 0.
@@ -170,7 +170,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         # if yy[2] > nnz-3:
         #     yy[2] = nnz-3
         a = np.array(
-            [fu(yy[0], yy[1], yy[2], t) / ddx, fv(yy[0], yy[1], yy[2], t) / ddy, fw(yy[0], yy[1], yy[2], t) / ddz])
+            [fu(yy[0], yy[1], yy[2], t) * invddx, fv(yy[0], yy[1], yy[2], t) * invddy, fw(yy[0], yy[1], yy[2], t) * invddz])
         return a
 
     # print 'fu'. f_u()
@@ -215,6 +215,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         print 'euler'
         toto = a = 0
         print ('0            50          100%')
+
         for i in xrange(nnx):
             for j in xrange(nny):
                 for k in range(tranche - 1, tranche + 2):

@@ -19,7 +19,18 @@ import sup3D
 ttot = time.time()
 Config = ConfigParser.ConfigParser()
 Config.read('parameters.ini')
-
+# a = np.arange(10e7)
+# b = np.arange(0, 20e7, 2)
+#
+# tttt = time.time()
+# ne.ncores = 4
+# c = ne.evaluate("2*a+3*b")
+# print (time.time()-tttt)
+# tttt = time.time()
+# c = 2*a+3*b
+# print (time.time()-tttt)
+# quit()
+# print c
 def ConfigSectionMap(section):
     dict1 = {}
     options = Config.options(section)
