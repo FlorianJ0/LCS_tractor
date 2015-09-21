@@ -10,7 +10,6 @@ import time
 # from pygsl import spline, errors
 # from pygsl import _numobj as numx
 from scipy.interpolate import interp1d
-from scipy.interpolate import interp2d
 from numpy import linalg as LA
 from scipy.interpolate import griddata
 from scipy.interpolate import RectBivariateSpline
@@ -80,7 +79,6 @@ def cgstki(vel, z, tt, dt, nx, ny, dim, domain, simtstep):
         interpU = velp
 
     # interp spatiale sur une grille r fois plus fine
-
 
     grid = np.indices((nnx, nny))
     grid = grid.astype(float)
@@ -159,7 +157,7 @@ def cgstki(vel, z, tt, dt, nx, ny, dim, domain, simtstep):
         for i in range(1, nnx - 1):
             for j in range(1, nny - 1):
                 dphi[i, j, 0, 0] = (grid_i[0, i + 1, j] - grid_i[0, i - 1, j]) / (
-                grid_iini[0, i + 1, j] - grid_iini[0, i - 1, j])
+                    grid_iini[0, i + 1, j] - grid_iini[0, i - 1, j])
                 dphi[i, j, 0, 1] = (grid_i[0, i, j + 1] - grid_i[0, i, j - 1]) / (
                     grid_iini[1, i, j + 1] - grid_iini[1, i, j - 1])
                 dphi[i, j, 1, 0] = (grid_i[1, i + 1, j] - grid_i[1, i - 1, j]) / (

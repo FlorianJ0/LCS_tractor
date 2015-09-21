@@ -20,6 +20,8 @@ import sup3D
 ttot = time.time()
 Config = ConfigParser.ConfigParser()
 Config.read('parameters.ini')
+
+
 # a = np.arange(10e7)
 # b = np.arange(0, 20e7, 2)
 #
@@ -39,11 +41,12 @@ def ConfigSectionMap(section):
         try:
             dict1[option] = Config.get(section, option)
             if dict1[option] == -1:
-                DebugPrint("skip: %s" % option)
+                print "skip: %s" % option
         except:
             print("exception on %s!" % option)
             dict1[option] = None
     return dict1
+
 
 # vitesse min pour savoir si on est in/out domain (a mettre a -100 pour la suite)
 outofdomain = ConfigSectionMap('filereading')['outofdomain']
@@ -51,29 +54,29 @@ outofdomain = ConfigSectionMap('filereading')['outofdomain']
 # t step de la simu
 simtstep = ConfigSectionMap('filereading')['timestep']
 # read file/s
-loc =  ConfigSectionMap('filereading')['folder']
+loc = ConfigSectionMap('filereading')['folder']
 
 print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-print 'Goord morning %s' %sup3D.hello()
+print 'Goord morning %s' % sup3D.hello()
 print 'Welcome in my lair.'
 print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 stamp = time.time()
 struct = ConfigSectionMap('filereading')['datastruct']
-if struct=='unstruct':
-    extend=np.array([0.05,0.15,0.04,0.14,0.2,0.3])
-    dim=np.array([20,20,20])
+if struct == 'unstruct':
+    extend = np.array([0.05, 0.15, 0.04, 0.14, 0.2, 0.3])
+    dim = np.array([20, 20, 20])
     vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk_unstructured.read_files(loc, dim, extend)
-    quit()
-elif struct=='struct':
+    # quit()
+elif struct == 'struct':
     vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk.read_files(loc)
-elif struct=='anal':
+elif struct == 'anal':
     vel, nx, ny, nz, dim_initial, tphys, dt, domain = gyronator.gyro()
 else:
     print 'wut ?'
-    quit()
+    #quit()
 
 print '-----------------------------------------------------'
-print 'Velocity read in %f s ' %(time.time()-stamp)
+print 'Velocity read in %f s ' % (time.time() - stamp)
 print '-----------------------------------------------------'
 
 """
@@ -93,8 +96,8 @@ z = float(z)
 # calcul sur un plan x y parceque jsuis trop une feignasse pour un code generique
 dim = 2
 
-
-eigval1, eigval3, eigvec1, eigvec3, interpU_i, bobol = cauchygreen3d.cgstki3(vel, z, tphys, dt, nx, ny, nz, 3, domain, simtstep)
+eigval1, eigval3, eigvec1, eigvec3, interpU_i, bobol = cauchygreen3d.cgstki3(vel, z, tphys, dt, nx, ny, nz, 3, domain,
+                                                                             simtstep)
 barriers.barrier_type(0, eigval1, eigval3, eigvec1, eigvec3, interpU_i, tphys, dt, nx, ny, nz, domain, simtstep, bobol)
 print '-----------------------------------------------------'
 print 'full total time  in %f s ' % (time.time() - ttot)

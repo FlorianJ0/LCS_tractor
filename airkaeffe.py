@@ -96,6 +96,7 @@ def rk45(f, x0, t):
 
     return x[-1], e[-1]
 
+
 # @jit
 def euler(f, x0, t):
     """Euler's method to solve x' = f(x,t) with x(t[0]) = x0.
@@ -159,8 +160,8 @@ def heun(f, x0, t, nx, ny):
             x[i + 1] = x[i]
             # print 'cut'
             break
-        elif x[i][0] > (nx-2) or x[i][0] < 2 or x[i][1] > (ny-2) or x[i][1]<2:
-            x[i+1] = x[i]
+        elif x[i][0] > (nx - 2) or x[i][0] < 2 or x[i][1] > (ny - 2) or x[i][1] < 2:
+            x[i + 1] = x[i]
             # print 'out of grid'
             break
 
@@ -169,8 +170,5 @@ def heun(f, x0, t, nx, ny):
             k1 = h * f(x[i], t[i])[0]
             k2 = h * f(x[i] + k1, t[i + 1])[0]
             x[i + 1] = x[i] + (k1 + k2) / 2.0
-
-
-
 
     return x

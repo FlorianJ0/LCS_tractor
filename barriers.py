@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+
 # from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 from scipy import ndimage
 
@@ -22,9 +23,9 @@ def ConfigSectionMap(section):
         try:
             dict1[option] = Config.get(section, option)
             if dict1[option] == -1:
-                DebugPrint("skip: %s" % option)
+                print "skip: %s" % option
         except:
-            print("exception on %s!" % option)
+            print "exception on %s!" % option
             dict1[option] = None
     return dict1
 
@@ -88,14 +89,15 @@ def reduced_lines(vect, nx, ny, nz, initpts, thresh, n, bobol):
         vj = ndimage.map_coordinates(vectj, [[x[0]], [x[1]]], order=2, mode='constant', cval=0.0, prefilter=False)
 
         # a = np.array([vi(x[0], x[1]), vj(x[0], x[1])])
-        a = np.array([vi, vj])
+        a = np.array([vi, vj])[:, 0]
+
         cond = np.dot(a, np.gradient(a))
         cut = False
         # if (1e-4 < abs(cond) < thresh):
         if abs(cond) < thresh and bobol[x[0], x[1]]:
             # i did the maths, must be right
-            newpos[0] = - 1. * vj#(x[0], x[1])
-            newpos[1] = 1. * vi#(x[0], x[1])
+            newpos[0] = - 1. * vj  # (x[0], x[1])
+            newpos[1] = 1. * vi  # (x[0], x[1])
         else:
             cut = True
         # print newpos
@@ -139,22 +141,22 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     # print eigvec.shape
     # print eigvecm.shape
 
-    a = np.sqrt(np.sqrt(eigval1))/(np.sqrt(eigval1)+np.sqrt(eigval3))
-    b = np.sqrt(np.sqrt(eigval3))/(np.sqrt(eigval1)+np.sqrt(eigval3))
+    a = np.sqrt(np.sqrt(eigval1)) / (np.sqrt(eigval1) + np.sqrt(eigval3))
+    b = np.sqrt(np.sqrt(eigval3)) / (np.sqrt(eigval1) + np.sqrt(eigval3))
     nnp = np.empty((nx, ny, 3))
     nnm = np.empty((nx, ny, 3))
     # print a.shape, nnp.shape
     for i in range(3):
-        nnp[:,:,i] = a * eigvec1[:,:,i] + b * eigvec3[:,:,i]
-        nnm[:,:,i] = a * eigvec1[:,:,i] - b * eigvec3[:,:,i]
+        nnp[:, :, i] = a * eigvec1[:, :, i] + b * eigvec3[:, :, i]
+        nnm[:, :, i] = a * eigvec1[:, :, i] - b * eigvec3[:, :, i]
 
-    #threshhods of seed finding
+    # threshhods of seed finding
     ths_strain_lines = np.float(ConfigSectionMap('barriers')['ths_strain_lines'])
     ths_stretch_lines = np.float(ConfigSectionMap('barriers')['ths_stretch_lines'])
     ths_ellipticp_lines = np.float(ConfigSectionMap('barriers')['ths_ellipticp_lines'])
     ths_ellipticm_lines = np.float(ConfigSectionMap('barriers')['ths_ellipticn_lines'])
 
-    #threshhods of line integration
+    # threshhods of line integration
     th_strain_lines = np.float(ConfigSectionMap('barriers')['th_strain_lines'])
     th_stretch_lines = np.float(ConfigSectionMap('barriers')['th_stretch_lines'])
     th_ellipticp_lines = np.float(ConfigSectionMap('barriers')['th_ellipticp_lines'])
@@ -197,11 +199,6 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     print '-----------------------------------------------------'
     print 'ellipticp lines computed  in %f s ' % (time.time() - stamp)
     print '-----------------------------------------------------'
-
-
-
-
-
 
     ftle = (1 / 0.16) * np.log(np.sqrt(eigval3 + 1e-8))
     magU = np.sqrt(vel[:, :, 7, 0, 0] ** 2 + vel[:, :, 7, 1, 0] ** 2 + vel[:, :, 7, 2, 0] ** 2)
@@ -255,10 +252,6 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     # plt.colorbar()
     # plt.title('ftle')
 
-
-
-
-
     # plt.subplot(235)
     # plt.imshow(magU)
     # for j in xrange(strain_lines.shape[0]):
@@ -269,5 +262,5 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     # for j in xrange(strain_lines.shape[0]):
     #     plt.plot(ellipticm_lines[17, 1, :], strain_lines[17, 0, :], 'ro-', ms=1)
 
-    plt.draw()
+    plt.show()
     return

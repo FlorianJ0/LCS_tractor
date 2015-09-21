@@ -37,9 +37,9 @@ def ConfigSectionMap(section):
         try:
             dict1[option] = Config.get(section, option)
             if dict1[option] == -1:
-                DebugPrint("skip: %s" % option)
+                print "skip: %s" % option
         except:
-            print("exception on %s!" % option)
+            print "exception on %s!" % option
             dict1[option] = None
     return dict1
 
@@ -195,7 +195,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     t = np.linspace(0, tt, N)
     bobol = np.zeros((nnx, nny))
     if rrk45 == 0:
-        print 'rk45, a checker'
+        print 'rk45 intregration method, a checker'
         toto = 0
         quit()
         for i in xrange(nnx):
@@ -214,7 +214,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                     toto += 1
         print '%i point skipped, ie. %f percents of total points of the slice' % (toto, 100 * toto / (ny * nx))
     elif rrk45 == 1:
-        print 'heun'
+        print 'heun intregration method'
         toto = 0
         for i in xrange(nnx):
             for j in xrange(nny):
@@ -222,19 +222,19 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                     y0 = grid_iini[:, i, j, k]
                     if np.all(np.abs(velp[i, j, k, :, 0]) > np.array([1e-7, 1e-7, 1e-7])):
                         bobol[i, j] = True
-                        grid_i[:, i, j, k] = heun(f_u, y0, t)[-1]
+                        grid_i[:, i, j, k] = heun(f_u, y0, t, nx, ny)[-1]
                     else:
                         grid_i[:, i, j, k] = [0, 0, 0]
                         toto += 1
         print '%i point skipped, ie. %f percents of total points of the slice' % (toto, 100 * toto / (ny * nx))
     elif rrk45 == 2:
-        print 'euler'
+        print 'euler intregration method'
         toto = a = 0
         print ('0            50          100%')
 
         for i in xrange(nnx):
             for j in xrange(nny):
-                for k in range(tranche - 1, tranche + 2):
+                for k in range(tranche - 2, tranche + 3):
                     y0 = grid_iini[:, i, j, k]
 
                     if np.all(np.abs(velp[i, j, k, :, 0]) > np.array([1e-7, 1e-7, 1e-7])):
@@ -499,7 +499,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         # ax3.quiver(X, Y, U, V, color=magu)
         # ax4.streamplot(X, Y, uu, vv, density=0.6, color='k', linewidth=magx)
 
-        plt.plot()
+        plt.show()
 
     print '-------------------------'
     print 'error', np.random.random_integers(0, 100)

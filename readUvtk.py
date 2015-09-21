@@ -19,7 +19,7 @@ def read_files(loc):
     if len(dircont) == 0:
         print 'po de fichiers'
         print 'con'
-        quit()
+        #quit()
     count = 0
     for i in dircont:
         reader = vtkRectilinearGridReader()
@@ -30,9 +30,9 @@ def read_files(loc):
         data = reader.GetOutput()
         dim = data.GetDimensions()
 
-        nx = dim[0]-1
-        ny = dim[1]-1
-        nz = dim[2]-1
+        nx = dim[0] - 1
+        ny = dim[1] - 1
+        nz = dim[2] - 1
 
         bounds = data.GetBounds()
         xmin = bounds[0]
@@ -53,9 +53,7 @@ def read_files(loc):
         if (count == 0):
             U = np.empty((nx, ny, nz, len(dim), len(dircont)))
 
-
-        s=i=j=k = 0
-
+        s = i = j = k = 0
 
         for k in xrange(nz):
             for j in xrange(ny):
@@ -64,12 +62,10 @@ def read_files(loc):
                     s += 1
         count += 1
 
-
     dt = 0.05
     tphys = count * dt
     print 'tphys = ', tphys
     print 'Files read'
     print '<<<<<<<<<>>>>>>>>>>'
-
 
     return U, nx, ny, nz, dim, tphys, dt, domain

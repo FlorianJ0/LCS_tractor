@@ -69,11 +69,11 @@ vectU = vn.vtk_to_numpy(arrowglyph)
 vectU[vectU < -20] = 'Nan'
 U = np.empty((nx, ny, nz, 3, 1))
 count = 0
-s=0
-i=j=k=0
+s = 0
+i = j = k = 0
 for i in xrange(nz):
     for j in xrange(ny):
         for k in xrange(nz):
             U[i, j, k, :, count] = vectU[s]
-            s+=1
+            s += 1
 count += 1
