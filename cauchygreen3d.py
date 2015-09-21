@@ -175,16 +175,19 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     invddx = 1 / ddx
     invddy = 1 / ddy
     invddz = 1 / ddz
-    # @vectorize
+
     def f_u(yy, t):
         coord = np.array([yy[0], yy[1], yy[2], t])
         # a = np.array(
         #     [interpu(coord) * invddx, interpv(coord) * invddy, interpw(coord) * invddz])
 
-        u = ndimage.map_coordinates(velpu, [[yy[0]], [yy[1]], [yy[2]], [t]],order=3, mode='constant', cval=0.0, prefilter=False)* invddx
-        v = ndimage.map_coordinates(velpv, [[yy[0]], [yy[1]], [yy[2]], [t]],order=3, mode='constant', cval=0.0, prefilter=False)* invddy
-        w = ndimage.map_coordinates(velpw, [[yy[0]], [yy[1]], [yy[2]], [t]],order=3, mode='constant', cval=0.0, prefilter=False)* invddz
-        return np.array([u,v,w])[:,0]
+        u = ndimage.map_coordinates(velpu, [[yy[0]], [yy[1]], [yy[2]], [t]], order=3, mode='constant', cval=0.0,
+                                    prefilter=False) * invddx
+        v = ndimage.map_coordinates(velpv, [[yy[0]], [yy[1]], [yy[2]], [t]], order=3, mode='constant', cval=0.0,
+                                    prefilter=False) * invddy
+        w = ndimage.map_coordinates(velpw, [[yy[0]], [yy[1]], [yy[2]], [t]], order=3, mode='constant', cval=0.0,
+                                    prefilter=False) * invddz
+        return np.array([u, v, w])[:, 0]
 
     # print 'fu'. f_u()
     solver = ode(f_u)
@@ -492,9 +495,9 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         # np.savetxt(outfile, dphi[:, :, 0, 0])
         ax8.imshow(dphi[:, :, 0, 1])
         ax9.imshow(dphi[:, :, 1, 1])
-    # ax2.imshow(didy)
-    # ax3.quiver(X, Y, U, V, color=magu)
-    # ax4.streamplot(X, Y, uu, vv, density=0.6, color='k', linewidth=magx)
+        # ax2.imshow(didy)
+        # ax3.quiver(X, Y, U, V, color=magu)
+        # ax4.streamplot(X, Y, uu, vv, density=0.6, color='k', linewidth=magx)
 
         plt.plot()
 

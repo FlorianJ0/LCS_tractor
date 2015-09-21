@@ -5,7 +5,9 @@ import ConfigParser
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 # from Scientific.Functions.Interpolation import InterpolatingFunction as IF
+from scipy import ndimage
 
 from airkaeffe import heun
 
@@ -72,8 +74,9 @@ def reduced_lines(vect, nx, ny, nz, initpts, thresh, n, bobol):
 
     # vectj = vect[:,:,1]
     axes = (x, y)
-    vi = IF(axes, vecti)
-    vj = IF(axes, vectj)
+    # vi = IF(axes, vecti)
+    # vj = IF(axes, vectj)
+    # vi = ndimage.map_coordinates(vecti)
 
     # vj = IF(axes, vectj)
 
@@ -81,14 +84,18 @@ def reduced_lines(vect, nx, ny, nz, initpts, thresh, n, bobol):
     def gamma(x, t):
         newpos = np.empty(2)
         # print 'x', x
-        a = np.array([vi(x[0], x[1]), vj(x[0], x[1])])
+        vi = ndimage.map_coordinates(vecti, [[x[0]], [x[1]]], order=2, mode='constant', cval=0.0, prefilter=False)
+        vj = ndimage.map_coordinates(vectj, [[x[0]], [x[1]]], order=2, mode='constant', cval=0.0, prefilter=False)
+
+        # a = np.array([vi(x[0], x[1]), vj(x[0], x[1])])
+        a = np.array([vi, vj])
         cond = np.dot(a, np.gradient(a))
         cut = False
         # if (1e-4 < abs(cond) < thresh):
         if abs(cond) < thresh and bobol[x[0], x[1]]:
             # i did the maths, must be right
-            newpos[0] = - 1. * vj(x[0], x[1])
-            newpos[1] = 1. * vi(x[0], x[1])
+            newpos[0] = - 1. * vj#(x[0], x[1])
+            newpos[1] = 1. * vi#(x[0], x[1])
         else:
             cut = True
         # print newpos
