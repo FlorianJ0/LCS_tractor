@@ -96,7 +96,7 @@ def rk45(f, x0, t):
 
     return x[-1], e[-1]
 
-
+# @jit
 def euler(f, x0, t):
     """Euler's method to solve x' = f(x,t) with x(t[0]) = x0.
 

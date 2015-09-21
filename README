@@ -1,3 +1,4 @@
+L'algorithme le plus classe du monde !
 Lagrangian Coherent Structure extraction tool (LCS-exTRACTOR) from .vtk data using information from http://dx.doi.org/10.1016/j.physd.2014.01.007 0167-2789/ and 10.1146/annurev-fluid-010313-14132. Also any work from G. Haller and S. C. Shadden.
 Data comes already on a vtk structured grid, one file per time with fixed time step.
 All parameters are in parameters.ini. The code might be parallelized some day.

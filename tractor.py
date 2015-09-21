@@ -5,9 +5,10 @@ __date__ = '30 Juillet 2015'
 'obj: calculer les  LCS hyperboliques depuis un champ de vitesse, ecoulement incompressible, periodique de sang dans un' \
 'AAA. Si possible ajouter LCS  elliptic et parabolic si j ai le temps. Le tout sur du vtk structured'
 #
-import numpy as np
 import time
 import ConfigParser
+
+import numpy as np
 
 import readUvtk
 import barriers

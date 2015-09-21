@@ -1,10 +1,11 @@
 __author__ = 'p0054421'
-import numpy as np
 import time
 import ConfigParser
 
+import numpy as np
 import matplotlib.pyplot as plt
-from Scientific.Functions.Interpolation import InterpolatingFunction as IF
+
+# from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 
 from airkaeffe import heun
 

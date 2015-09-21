@@ -3,6 +3,8 @@ __date__ = '30 Juillet 2015'
 
 import numpy as np
 from scipy import *
+import matplotlib.pyplot as plt
+
 # from vtk.util import numpy_support as vn
 # import pygsl._numobj as numx
 import time
@@ -10,11 +12,12 @@ import time
 # from pygsl import _numobj as numx
 import scipy.version as ver
 from numpy import linalg as LA
-from Scientific.Functions.Interpolation import InterpolatingFunction as IF
-# from scipy.interpolate import RegularGridInterpolator as IF
+from scipy import ndimage
+# from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 from scipy.integrate import ode
 import sys
 from airkaeffe import rk45, heun, euler
+
 sys.path.append('pytricubic-master/')
 import tricubic
 import ConfigParser
@@ -104,7 +107,6 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     print 'tranche evaluee %i' % tranche
 
     print 'dt', dt, 't physique', tt, '# time steps', ttt
-
     # interp spatiale sur une grille r fois plus fine
 
     grid = np.indices((nnx, nny, nnz))
@@ -131,25 +133,38 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     else:
         print 'scipy version %s is high, so am I' % ver.full_version
 
-    # x = np.linspace(domain[0], domain[1], nx)
-    # y = np.linspace(domain[2], domain[3], ny)
-    # z = np.linspace(domain[4], domain[5], nz)
-    x = np.arange(0, nnx, 1)
-    y = np.arange(0, nny, 1)
-    z = np.arange(0, nnz, 1)
-    # bobol = velp
+    # x = np.linspace(0, nnx - 1, nnx, dtype=int16)
+    # y = np.linspace(0, nny - 1, nny, dtype=int16)
+    # z = np.linspace(0, nnz - 1, nnz, dtype=int16)
+    # t = np.linspace(0, len(ttt) - 1, len(ttt), dtype=int16)
 
     velpu = velp[:, :, :, 0, :]
     velpv = velp[:, :, :, 1, :]
     velpw = velp[:, :, :, 2, :]
+
     interpU_i = velp
     stamp = time.time()
 
-    print 'linear interp from Scientific python'
-    axes = (x, y, z, ttt)
-    fu = IF(axes, velpu)
-    fv = IF(axes, velpv)
-    fw = IF(axes, velpw)
+    # def fu(x, y, z, t):
+    #     return velpu[x, y, z, t]
+    #
+    # def fv(x, y, z, t):
+    #     return velpv[x, y, z, t]
+    #
+    # def fw(x, y, z, t):
+    #     return velpw[x, y, z, t]
+    #
+    # datau = fu(*np.meshgrid(x, y, z, t, indexing='ij', sparse=False))
+    # datav = fv(*np.meshgrid(x, y, z, t, indexing='ij', sparse=False))
+    # dataw = fw(*np.meshgrid(x, y, z, t, indexing='ij', sparse=False))
+    #
+    # interpu = RegularGridInterpolator((x, y, z, t), datau, method='nearest', bounds_error=False, fill_value=0)
+    # interpv = RegularGridInterpolator((x, y, z, t), datav, method='nearest', bounds_error=False, fill_value=0)
+    # interpw = RegularGridInterpolator((x, y, z, t), dataw, method='nearest', bounds_error=False, fill_value=0)
+
+
+    # quit()
+    print 'linear interp NOT from Scientific python'
 
     print 'avection time !'
 
@@ -157,21 +172,19 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     # ou: y point = f(x,t)
     # fonction f:
     nn = np.array([nnx, nny, nnz])
-    invddx = 1/ddx
-    invddy = 1/ddy
-    invddz = 1/ddz
-    # @jit
+    invddx = 1 / ddx
+    invddy = 1 / ddy
+    invddz = 1 / ddz
+    # @vectorize
     def f_u(yy, t):
-        for i in xrange(3):
-            yy[i] = yy[i] if yy[i] > 3 else 0.
-            yy[i] = yy[i] if yy[i] < (nn[i] - 3) else 0.
-        # if yy[2] < 3:
-        #     yy[2] = 3
-        # if yy[2] > nnz-3:
-        #     yy[2] = nnz-3
-        a = np.array(
-            [fu(yy[0], yy[1], yy[2], t) * invddx, fv(yy[0], yy[1], yy[2], t) * invddy, fw(yy[0], yy[1], yy[2], t) * invddz])
-        return a
+        coord = np.array([yy[0], yy[1], yy[2], t])
+        # a = np.array(
+        #     [interpu(coord) * invddx, interpv(coord) * invddy, interpw(coord) * invddz])
+
+        u = ndimage.map_coordinates(velpu, [[yy[0]], [yy[1]], [yy[2]], [t]],order=3, mode='constant', cval=0.0, prefilter=False)* invddx
+        v = ndimage.map_coordinates(velpv, [[yy[0]], [yy[1]], [yy[2]], [t]],order=3, mode='constant', cval=0.0, prefilter=False)* invddy
+        w = ndimage.map_coordinates(velpw, [[yy[0]], [yy[1]], [yy[2]], [t]],order=3, mode='constant', cval=0.0, prefilter=False)* invddz
+        return np.array([u,v,w])[:,0]
 
     # print 'fu'. f_u()
     solver = ode(f_u)
@@ -231,7 +244,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
             if (100 * a) % 10 < 1e-3:
                 rpog()
 
-        print '\n %i point skipped, ie. %f percents of total points of the domain' %(toto, 100 * toto / (ny * nx * 5))
+        print '\n %i point skipped, ie. %f percents of total points of the domain' % (toto, 100 * toto / (ny * nx * 5))
     else:
         print 'wut ?'
         quit()
@@ -451,39 +464,39 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         print 'Flow map and eigval/eigvec computed in %f s ' % (time.time() - stamp)
         print '-----------------------------------------------------'
 
-        # f, ((ax1, ax2, ax3), (ax4, ax5, ax6), (ax7, ax8, ax9)) = plt.subplots(3, 3, sharex=True, sharey=True)
+        f, ((ax1, ax2, ax3), (ax4, ax5, ax6), (ax7, ax8, ax9)) = plt.subplots(3, 3, sharex=True, sharey=True)
         # print didx.shape
         # Y, X = np.mgrid[0:nx * dx:rr * nx * 1j, 0:ny * dy:rr * ny * 1j]
 
-        # uu = grid_i[0, :, :, zzplan] - grid_iini[0, :, :, zzplan]  # -grid_iini[0,:,:]
-        # vv = grid_i[1, :, :, zzplan] - grid_iini[1, :, :, zzplan]  # -grid_iini[1,:,:]
-        # ww = grid_i[2, :, :, zzplan] - grid_iini[2, :, :, zzplan]  # -grid_iini[1,:,:]
-        # magx = np.sqrt(uu * uu + vv * vv + ww * ww)
+        uu = grid_i[0, :, :, zzplan] - grid_iini[0, :, :, zzplan]  # -grid_iini[0,:,:]
+        vv = grid_i[1, :, :, zzplan] - grid_iini[1, :, :, zzplan]  # -grid_iini[1,:,:]
+        ww = grid_i[2, :, :, zzplan] - grid_iini[2, :, :, zzplan]  # -grid_iini[1,:,:]
+        magx = np.sqrt(uu * uu + vv * vv + ww * ww)
         # U = interpU_i[:, :, 0, 0]
         # V = interpU_i[:, :, 1, 0]
         # magu = np.sqrt(U * U + V * V)
         # print grid_i[0, 5, :]- grid_iini[0, 5, :]
-        # ax4.imshow(velpu[:, :, tranche, 0], vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
-        # ax5.imshow(velpv[:, :, tranche, 0], vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
-        # ax6.imshow(velpw[:, :, tranche, 0], vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
+        ax4.imshow(velpu[:, :, tranche, 0], vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
+        ax5.imshow(velpv[:, :, tranche, 0], vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
+        ax6.imshow(velpw[:, :, tranche, 0], vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
         # ax2.imshow(dispu[:,:,tranche-1]-dispu[:,:,tranche+1])
         # ax3.imshow(dispu[:,:,tranche+1]-grid_iini[0,:,:,tranche+1])
         # ax3.imshow(grid_i[2, :, :,zzplan])
         # ax2.imshow(magx)
-        # ax1.imshow(grid_i[0, :, :, tranche])
-        # ax2.imshow(grid_i[1, :, :, tranche])
-        # ax3.imshow(grid_i[2, :, :, tranche])
+        ax1.imshow(grid_i[0, :, :, tranche])
+        ax2.imshow(grid_i[1, :, :, tranche])
+        ax3.imshow(grid_i[2, :, :, tranche])
 
-        # ax7.imshow(dphi[:, :, 0, 0])
+        ax7.imshow(dphi[:, :, 0, 0])
         # with file('test.txt', 'w') as outfile:
         # np.savetxt(outfile, dphi[:, :, 0, 0])
-    # ax8.imshow(dphi[:, :, 0, 1])
-    # ax9.imshow(dphi[:, :, 1, 1])
+        ax8.imshow(dphi[:, :, 0, 1])
+        ax9.imshow(dphi[:, :, 1, 1])
     # ax2.imshow(didy)
     # ax3.quiver(X, Y, U, V, color=magu)
     # ax4.streamplot(X, Y, uu, vv, density=0.6, color='k', linewidth=magx)
 
-    # plt.draw()
+        plt.plot()
 
     print '-------------------------'
     print 'error', np.random.random_integers(0, 100)
