@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 
 
+
 # from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 from scipy import ndimage
 
@@ -217,7 +218,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     for i in xrange(stretch_lines.shape[0]):
         plt.plot(stretch_lines[i, 1, :], stretch_lines[i, 0, :], 'k.', ms=1)
     plt.colorbar()
-    plt.title('strain_lines, (eiv 1)')
+    plt.title('stretch_lines, (eiv 1)')
 
     plt.subplot(223)
     plt.imshow(magU)

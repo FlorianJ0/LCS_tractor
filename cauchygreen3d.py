@@ -181,11 +181,11 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         # a = np.array(
         #     [interpu(coord) * invddx, interpv(coord) * invddy, interpw(coord) * invddz])
 
-        u = ndimage.map_coordinates(velpu, [[yy[0]], [yy[1]], [yy[2]], [t]], order=3, mode='constant', cval=0.0,
+        u = ndimage.map_coordinates(velpu, [[yy[0]], [yy[1]], [yy[2]], [t]], order=4, mode='constant', cval=0.0,
                                     prefilter=False) * invddx
-        v = ndimage.map_coordinates(velpv, [[yy[0]], [yy[1]], [yy[2]], [t]], order=3, mode='constant', cval=0.0,
+        v = ndimage.map_coordinates(velpv, [[yy[0]], [yy[1]], [yy[2]], [t]], order=4, mode='constant', cval=0.0,
                                     prefilter=False) * invddy
-        w = ndimage.map_coordinates(velpw, [[yy[0]], [yy[1]], [yy[2]], [t]], order=3, mode='constant', cval=0.0,
+        w = ndimage.map_coordinates(velpw, [[yy[0]], [yy[1]], [yy[2]], [t]], order=4, mode='constant', cval=0.0,
                                     prefilter=False) * invddz
         return np.array([u, v, w])[:, 0]
 
