@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 
 
 
+
 # from Scientific.Functions.Interpolation import InterpolatingFunction as IF
 from scipy import ndimage
 
@@ -105,7 +106,7 @@ def reduced_lines(vect, nx, ny, nz, initpts, thresh, n, bobol):
         return newpos, cut
 
     print 'integrate reduced LCSs'
-    N = n * 1
+    N = n * 0.5
     # on suppose qu on est toujours normal  a z
     # norm vect = 0 0 -1
     # donc n vectproduct k = kj -ki 0
@@ -168,7 +169,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     # print initpts3.nonzero()
     seeds3 = np.array([initpts3.nonzero()[0], initpts3.nonzero()[1]])
     print seeds3.shape
-    strain_lines = reduced_lines(eigvec3, nx, ny, nz, seeds3, th_strain_lines, 500, bobol)
+    strain_lines = reduced_lines(eigvec3, nx, ny, nz, seeds3, th_strain_lines, 1000, bobol)
     print "number of seeds %i" % seeds3.shape[1]
     print '-----------------------------------------------------'
     print 'strain lines (repelling) computed  in %f s ' % (time.time() - stamp)
@@ -177,7 +178,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     stamp = time.time()
     initpts1 = helic(eigvec1, dx, dy, dz, ths_stretch_lines, bobol)
     seeds1 = np.array([initpts1.nonzero()[0], initpts1.nonzero()[1]])
-    stretch_lines = reduced_lines(eigvec1, nx, ny, nz, seeds1, th_stretch_lines, 500, bobol)
+    stretch_lines = reduced_lines(eigvec1, nx, ny, nz, seeds1, th_stretch_lines, 1000, bobol)
     print 'number of seeds %i' % seeds1.shape[1]
     print '-----------------------------------------------------'
     print 'stretch (attracting) lines computed  in %f s ' % (time.time() - stamp)
@@ -186,7 +187,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     stamp = time.time()
     initptsp = helic(nnp, dx, dy, dz, ths_ellipticp_lines, bobol)
     seedsp = np.array([initptsp.nonzero()[0], initptsp.nonzero()[1]])
-    ellipticp = reduced_lines(nnp, nx, ny, nz, seedsp, th_ellipticp_lines, 500, bobol)
+    ellipticp = reduced_lines(nnp, nx, ny, nz, seedsp, th_ellipticp_lines, 1000, bobol)
     print 'number of seeds %i' % seedsp.shape[1]
     print '-----------------------------------------------------'
     print 'ellipticp lines computed  in %f s ' % (time.time() - stamp)
@@ -195,7 +196,7 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     stamp = time.time()
     initptsm = helic(nnm, dx, dy, dz, ths_ellipticm_lines, bobol)
     seedsm = np.array([initptsm.nonzero()[0], initptsm.nonzero()[1]])
-    ellipticm = reduced_lines(nnm, nx, ny, nz, seedsm, th_ellipticn_lines, 500, bobol)
+    ellipticm = reduced_lines(nnm, nx, ny, nz, seedsm, th_ellipticn_lines, 1000, bobol)
     print 'number of seeds %i' % seedsm.shape[1]
     print '-----------------------------------------------------'
     print 'ellipticp lines computed  in %f s ' % (time.time() - stamp)
@@ -209,28 +210,28 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     # eigval1 /=np.max(np.abs(eigval1))
     plt.imshow(magU)
     for j in xrange(strain_lines.shape[0]):
-        plt.plot(strain_lines[:, 1, :], strain_lines[:, 0, :], 'k.', ms=1)
+        plt.plot(strain_lines[:, 1, ::2], strain_lines[:, 0, ::2], 'k.', ms=1)
     plt.colorbar()
     plt.title('strain_lines, (eiv 3)')
 
     plt.subplot(222)
     plt.imshow(magU)
     for i in xrange(stretch_lines.shape[0]):
-        plt.plot(stretch_lines[i, 1, :], stretch_lines[i, 0, :], 'k.', ms=1)
+        plt.plot(stretch_lines[i, 1, ::2], stretch_lines[i, 0, ::2], 'k.', ms=1)
     plt.colorbar()
     plt.title('stretch_lines, (eiv 1)')
 
     plt.subplot(223)
     plt.imshow(magU)
     for i in xrange(ellipticp.shape[0]):
-        plt.plot(ellipticp[i, 1, :], ellipticp[i, 0, :], 'k.', ms=1)
+        plt.plot(ellipticp[i, 1, ::2], ellipticp[i, 0, ::2], 'k.', ms=1)
     plt.colorbar()
     plt.title('ellipticp ')
 
     plt.subplot(224)
     plt.imshow(magU)
     for i in xrange(ellipticm.shape[0]):
-        plt.plot(ellipticm[i, 1, :], ellipticm[i, 0, :], 'k.', ms=1)
+        plt.plot(ellipticm[i, 1, ::2], ellipticm[i, 0, ::2], 'k.', ms=1)
     plt.colorbar()
     plt.title('ellipticm')
 

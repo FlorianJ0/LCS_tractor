@@ -4,10 +4,10 @@ import numpy as np
 
 nx = 50
 ny = 25
-nz = 5
+nz = 25
 dx = 4e-2
 dy = 4e-2
-dz = 4e-2
+dz = 1e-2
 ttot = 5
 dt = 0.5
 w = 2 * np.pi / 10
@@ -36,8 +36,8 @@ def dfdx(x, t):
 
 def gyro():
     vel = np.empty((nx, ny, 2, int(ttot / dt)))  #
-    nz = 5
-    vel3D = np.empty((nx, ny, nz, 3, int(ttot / dt)))  #
+    # nz = 5
+    vel3D = np.zeros((nx, ny, nz, 3, int(ttot / dt))) * (-1e-3)  #
 
     for t in range(0, int(ttot / dt)):
         tt = t * dt
@@ -52,13 +52,13 @@ def gyro():
         vel3D[:, :, 0, 0:2, t] = vel[:, :, :, t]
 
     for k in range(1, nz):
-        vel3D[:, :, k, 0:2, t] = vel3D[:, :, 0, 0:2, t]
+        vel3D[:, :, k, :, :] = vel3D[:, :, 0, :, :] -1e-3
 
-    vel3D[:, :, :, 2, :] = -1e-3
+    # vel3D[:, :, :, 2, :] = -1e-3
 
     print vel.shape
     domain = np.array([0, 2, 0, 1, 0, 0.1])
     # nz = 0
-    dim_initial = 2
-
+    dim_initial = 3
+    print vel3D.shape, nx, ny, nz, domain, dim_initial
     return vel3D, nx, ny, nz, dim_initial, ttot, dt, domain

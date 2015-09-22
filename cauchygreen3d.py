@@ -87,7 +87,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     domain = domain.astype(float)
     dx = abs(domain[1] - domain[0]) / nx
     dy = abs(domain[3] - domain[2]) / ny
-    dz = abs(domain[5] - domain[4]) / ny
+    dz = abs(domain[5] - domain[4]) / nz
     print 'dx', dx
     print 'dy', dy
     print 'dz', dz
@@ -231,12 +231,10 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         print 'euler intregration method'
         toto = a = 0
         print ('0            50          100%')
-
         for i in xrange(nnx):
             for j in xrange(nny):
                 for k in range(tranche - 2, tranche + 3):
                     y0 = grid_iini[:, i, j, k]
-
                     if np.all(np.abs(velp[i, j, k, :, 0]) > np.array([1e-7, 1e-7, 1e-7])):
                         bobol[i, j] = True
                         grid_i[:, i, j, k] = euler(f_u, y0, t)[-1]
