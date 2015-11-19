@@ -10,16 +10,18 @@ import ConfigParser
 
 import numpy as np
 
-import readUvtk
+# import readUvtk
 import barriers
 import cauchygreen3d
 import gyronator
-import readUvtk_unstructured
 import sup3D
 
 ttot = time.time()
 Config = ConfigParser.ConfigParser()
 Config.read('parameters.ini')
+
+print 'numpy -v'
+print np.show_config()
 
 
 # a = np.arange(10e7)
@@ -65,10 +67,11 @@ struct = ConfigSectionMap('filereading')['datastruct']
 if struct == 'unstruct':
     extend = np.array([0.05, 0.15, 0.04, 0.14, 0.2, 0.3])
     dim = np.array([20, 20, 20])
-    vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk_unstructured.read_files(loc, dim, extend)
+    # vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk_unstructured.read_files(loc, dim, extend)
     # quit()
 elif struct == 'struct':
-    vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk.read_files(loc)
+    print "struct"
+    # vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk.read_files(loc)
 elif struct == 'anal':
     vel, nx, ny, nz, dim_initial, tphys, dt, domain = gyronator.gyro()
 else:

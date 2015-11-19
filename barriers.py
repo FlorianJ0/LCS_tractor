@@ -3,7 +3,6 @@ import time
 import ConfigParser
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 
@@ -205,64 +204,35 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
     ftle = (1 / 0.16) * np.log(np.sqrt(eigval3 + 1e-8))
     magU = np.sqrt(vel[:, :, 7, 0, 0] ** 2 + vel[:, :, 7, 1, 0] ** 2 + vel[:, :, 7, 2, 0] ** 2)
 
-    plt.subplot(221)
-    # eigval3 /=np.max(np.abs(eigval3-100))
-    # eigval1 /=np.max(np.abs(eigval1))
-    plt.imshow(magU)
-    for j in xrange(strain_lines.shape[0]):
-        plt.plot(strain_lines[:, 1, ::2], strain_lines[:, 0, ::2], 'k.', ms=1)
-    plt.colorbar()
-    plt.title('strain_lines, (eiv 3)')
-
-    plt.subplot(222)
-    plt.imshow(magU)
-    for i in xrange(stretch_lines.shape[0]):
-        plt.plot(stretch_lines[i, 1, ::2], stretch_lines[i, 0, ::2], 'k.', ms=1)
-    plt.colorbar()
-    plt.title('stretch_lines, (eiv 1)')
-
-    plt.subplot(223)
-    plt.imshow(magU)
-    for i in xrange(ellipticp.shape[0]):
-        plt.plot(ellipticp[i, 1, ::2], ellipticp[i, 0, ::2], 'k.', ms=1)
-    plt.colorbar()
-    plt.title('ellipticp ')
-
-    plt.subplot(224)
-    plt.imshow(magU)
-    for i in xrange(ellipticm.shape[0]):
-        plt.plot(ellipticm[i, 1, ::2], ellipticm[i, 0, ::2], 'k.', ms=1)
-    plt.colorbar()
-    plt.title('ellipticm')
-
+    # plt.subplot(221)
     #
-    # plt.subplot(323)
-    # plt.imshow(vel[:, :, 14, 0, 0])
-    # plt.colorbar()
-    #
-    # plt.subplot(324)
-    # plt.imshow(vel[:, :, 14, 1, 0])
-    # plt.colorbar()
-    #
-    # plt.subplot(325)
-    # plt.imshow((initpts3))
-    # plt.colorbar()
-    # plt.title('initpts3')
-    #
-    # plt.subplot(326)
-    # plt.imshow(ftle, vmin=0, vmax=8, cmap='jet')
-    # plt.colorbar()
-    # plt.title('ftle')
-
-    # plt.subplot(235)
     # plt.imshow(magU)
     # for j in xrange(strain_lines.shape[0]):
-    #     plt.plot(ellipticp_lines[17, 1, :], strain_lines[17, 0, :], 'ro-', ms=1)
+    #     plt.plot(strain_lines[:, 1, ::2], strain_lines[:, 0, ::2], 'k.', ms=1)
+    # plt.colorbar()
+    # plt.title('strain_lines, (eiv 3)')
     #
-    # plt.subplot(236)
+    # plt.subplot(222)
     # plt.imshow(magU)
-    # for j in xrange(strain_lines.shape[0]):
-    #     plt.plot(ellipticm_lines[17, 1, :], strain_lines[17, 0, :], 'ro-', ms=1)
-
-    plt.show()
+    # for i in xrange(stretch_lines.shape[0]):
+    #     plt.plot(stretch_lines[i, 1, ::2], stretch_lines[i, 0, ::2], 'k.', ms=1)
+    # plt.colorbar()
+    # plt.title('stretch_lines, (eiv 1)')
+    #
+    # plt.subplot(223)
+    # plt.imshow(magU)
+    # for i in xrange(ellipticp.shape[0]):
+    #     plt.plot(ellipticp[i, 1, ::2], ellipticp[i, 0, ::2], 'k.', ms=1)
+    # plt.colorbar()
+    # plt.title('ellipticp ')
+    #
+    # plt.subplot(224)
+    # plt.imshow(magU)
+    # for i in xrange(ellipticm.shape[0]):
+    #     plt.plot(ellipticm[i, 1, ::2], ellipticm[i, 0, ::2], 'k.', ms=1)
+    # plt.colorbar()
+    # plt.title('ellipticm')
+    #
+    #
+    # plt.show()
     return

@@ -3,7 +3,6 @@ __date__ = '30 Juillet 2015'
 
 import numpy as np
 from scipy import *
-import matplotlib.pyplot as plt
 
 # from vtk.util import numpy_support as vn
 # import pygsl._numobj as numx
@@ -465,39 +464,39 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         print 'Flow map and eigval/eigvec computed in %f s ' % (time.time() - stamp)
         print '-----------------------------------------------------'
 
-        f, ((ax1, ax2, ax3), (ax4, ax5, ax6), (ax7, ax8, ax9)) = plt.subplots(3, 3, sharex=True, sharey=True)
-        # print didx.shape
-        # Y, X = np.mgrid[0:nx * dx:rr * nx * 1j, 0:ny * dy:rr * ny * 1j]
-
-        uu = grid_i[0, :, :, zzplan] - grid_iini[0, :, :, zzplan]  # -grid_iini[0,:,:]
-        vv = grid_i[1, :, :, zzplan] - grid_iini[1, :, :, zzplan]  # -grid_iini[1,:,:]
-        ww = grid_i[2, :, :, zzplan] - grid_iini[2, :, :, zzplan]  # -grid_iini[1,:,:]
-        magx = np.sqrt(uu * uu + vv * vv + ww * ww)
-        # U = interpU_i[:, :, 0, 0]
-        # V = interpU_i[:, :, 1, 0]
-        # magu = np.sqrt(U * U + V * V)
-        # print grid_i[0, 5, :]- grid_iini[0, 5, :]
-        ax4.imshow(velpu[:, :, tranche, 0], vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
-        ax5.imshow(velpv[:, :, tranche, 0], vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
-        ax6.imshow(velpw[:, :, tranche, 0], vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
-        # ax2.imshow(dispu[:,:,tranche-1]-dispu[:,:,tranche+1])
-        # ax3.imshow(dispu[:,:,tranche+1]-grid_iini[0,:,:,tranche+1])
-        # ax3.imshow(grid_i[2, :, :,zzplan])
-        # ax2.imshow(magx)
-        ax1.imshow(grid_i[0, :, :, tranche])
-        ax2.imshow(grid_i[1, :, :, tranche])
-        ax3.imshow(grid_i[2, :, :, tranche])
-
-        ax7.imshow(dphi[:, :, 0, 0])
-        # with file('test.txt', 'w') as outfile:
-        # np.savetxt(outfile, dphi[:, :, 0, 0])
-        ax8.imshow(dphi[:, :, 0, 1])
-        ax9.imshow(dphi[:, :, 1, 1])
-        # ax2.imshow(didy)
-        # ax3.quiver(X, Y, U, V, color=magu)
-        # ax4.streamplot(X, Y, uu, vv, density=0.6, color='k', linewidth=magx)
-
-        plt.show()
+        # f, ((ax1, ax2, ax3), (ax4, ax5, ax6), (ax7, ax8, ax9)) = plt.subplots(3, 3, sharex=True, sharey=True)
+        # # print didx.shape
+        # # Y, X = np.mgrid[0:nx * dx:rr * nx * 1j, 0:ny * dy:rr * ny * 1j]
+        #
+        # uu = grid_i[0, :, :, zzplan] - grid_iini[0, :, :, zzplan]  # -grid_iini[0,:,:]
+        # vv = grid_i[1, :, :, zzplan] - grid_iini[1, :, :, zzplan]  # -grid_iini[1,:,:]
+        # ww = grid_i[2, :, :, zzplan] - grid_iini[2, :, :, zzplan]  # -grid_iini[1,:,:]
+        # magx = np.sqrt(uu * uu + vv * vv + ww * ww)
+        # # U = interpU_i[:, :, 0, 0]
+        # # V = interpU_i[:, :, 1, 0]
+        # # magu = np.sqrt(U * U + V * V)
+        # # print grid_i[0, 5, :]- grid_iini[0, 5, :]
+        # ax4.imshow(velpu[:, :, tranche, 0], vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
+        # ax5.imshow(velpv[:, :, tranche, 0], vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
+        # ax6.imshow(velpw[:, :, tranche, 0], vmin=-0.05, vmax=0.05, cmap='jet', aspect='auto')
+        # # ax2.imshow(dispu[:,:,tranche-1]-dispu[:,:,tranche+1])
+        # # ax3.imshow(dispu[:,:,tranche+1]-grid_iini[0,:,:,tranche+1])
+        # # ax3.imshow(grid_i[2, :, :,zzplan])
+        # # ax2.imshow(magx)
+        # ax1.imshow(grid_i[0, :, :, tranche])
+        # ax2.imshow(grid_i[1, :, :, tranche])
+        # ax3.imshow(grid_i[2, :, :, tranche])
+        #
+        # ax7.imshow(dphi[:, :, 0, 0])
+        # # with file('test.txt', 'w') as outfile:
+        # # np.savetxt(outfile, dphi[:, :, 0, 0])
+        # ax8.imshow(dphi[:, :, 0, 1])
+        # ax9.imshow(dphi[:, :, 1, 1])
+        # # ax2.imshow(didy)
+        # # ax3.quiver(X, Y, U, V, color=magu)
+        # # ax4.streamplot(X, Y, uu, vv, density=0.6, color='k', linewidth=magx)
+        #
+        # plt.show()
 
     print '-------------------------'
     print 'error', np.random.random_integers(0, 100)

@@ -13,7 +13,6 @@ from scipy.interpolate import interp1d
 from numpy import linalg as LA
 from scipy.interpolate import griddata
 from scipy.interpolate import RectBivariateSpline
-import matplotlib.pyplot as plt
 
 
 # import vtk
@@ -214,27 +213,22 @@ def cgstki(vel, z, tt, dt, nx, ny, dim, domain, simtstep):
                 print i, j, 'EIG NOT ORDERED DAMMIT'
     print 'time= %f' % (time.time() - stamp)
 
-    f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
-    # print didx.shape
-    Y, X = np.mgrid[0:nx * dx:rr * nx * 1j, 0:ny * dy:rr * ny * 1j]
+    #
+    # f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
+    # Y, X = np.mgrid[0:nx * dx:rr * nx * 1j, 0:ny * dy:rr * ny * 1j]
+    #
+    # uu = grid_i[0, :, :] - grid_iini[0, :, :]  # -grid_iini[0,:,:]
+    # vv = grid_i[1, :, :] - grid_iini[1, :, :]  # -grid_iini[1,:,:]
+    # magx = np.sqrt(uu * uu + vv * vv)
+    # U = interpU_i[:, :, 0, 0]
+    # V = interpU_i[:, :, 1, 0]
+    # magu = np.sqrt(U * U + V * V)
+    # ax1.imshow(uu)
+    # ax2.imshow(vv)
+    # ax3.imshow(feuteuleu)
+    # ax4.imshow(magx)
 
-    uu = grid_i[0, :, :] - grid_iini[0, :, :]  # -grid_iini[0,:,:]
-    vv = grid_i[1, :, :] - grid_iini[1, :, :]  # -grid_iini[1,:,:]
-    magx = np.sqrt(uu * uu + vv * vv)
-    U = interpU_i[:, :, 0, 0]
-    V = interpU_i[:, :, 1, 0]
-    magu = np.sqrt(U * U + V * V)
-    # print grid_i[0, 5, :]- grid_iini[0, 5, :]
-    ax1.imshow(uu)
-    ax2.imshow(vv)
-    # ax2.imshow(magx)
-    # ax2.imshow(didy)
-    # ax2.imshow(didy)
-    ax3.imshow(feuteuleu)
-    ax4.imshow(magx)
-    # ax3.quiver(X, Y, U, V, color=magu)
-    # ax4.streamplot(X, Y, uu, vv, density=0.6, color='k', linewidth=magx)
-    # plt.show()
+
     print '-------------------------'
     print 'error', np.random.random_integers(0, 100)
     print '-------------------------'
