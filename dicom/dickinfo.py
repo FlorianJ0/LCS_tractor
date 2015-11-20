@@ -2,12 +2,11 @@ __author__ = 'p0054421'
 import os
 import os.path
 import re
-import time
 import shutil
+import time
 from os.path import expanduser
 
 import numpy as np
-
 import pydicom
 
 patate = '/home/p0054421/Downloads/testDicom/'
