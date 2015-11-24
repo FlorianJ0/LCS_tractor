@@ -8,5 +8,5 @@ setup(
     license='',
     author='p0054421',
     author_email='',
-    description='', requires=['numpy', 'scipy', 'scipy', 'numpy', 'scipy', 'scipy', 'numpy', 'matplotlib']
+    description='', requires=['numpy', 'scipy', 'scipy', 'numpy', 'scipy', 'scipy', 'numpy', 'matplotlib', 'pydicom']
 )

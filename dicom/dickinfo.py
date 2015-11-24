@@ -13,6 +13,7 @@ from anonymisator import anonymize
 
 patate = '/home/p0054421/Downloads/testDicom/'
 
+
 def contained_dirs(dir):
     return filter(os.path.isdir,
                   [os.path.join(dir, f) for f in os.listdir(dir)])
@@ -69,11 +70,11 @@ def rangator(folder):
             initiales = ''
             splitname = re.split(r'[\s,.|^/]+', name)
             lenn = len(splitname) - 1
-            for i in xrange(len(splitname)):
-                if i < lenn:
-                    initiales += splitname[i][:1]
+            for j in xrange(len(splitname)):
+                if j < lenn:
+                    initiales += splitname[j][:1]
                 else:
-                    initiales += splitname[i][:3]
+                    initiales += splitname[j][:3]
 
             date = imm.AcquisitionDate
             patient_folder_new = patient_folder + '/AAA_' + initiales
@@ -103,6 +104,8 @@ def rangator(folder):
             print 'movint to next acquisition'
             print ''
     return
+
+
 def anon(fname):
     patient_list = contained_dirs(fname)
 
@@ -122,10 +125,9 @@ def anon(fname):
                     ds = pydicom.read_file(image)
                     ID = ds.PatientID
                     new_PN = ID
-                    new_ID = 'FLOW_' + os.path.split(i)[1] +'_'+ID
-
+                    new_ID = 'FLOW_' + os.path.split(i)[1] + '_' + ID
                     anonymize(image, image, new_person_name=new_PN,
-              new_patient_id=new_ID, remove_curves=True, remove_private_tags=True)
+                              new_patient_id=new_ID, remove_curves=True, remove_private_tags=True)
 
                     if ll % 50 == 0:
                         print 'anonymized', ll, 'over', len(filenames)
@@ -134,9 +136,6 @@ def anon(fname):
         else:
             continue
     return
-
-
-
 
 
 rangator(patate)
