@@ -37,7 +37,6 @@ for dataset in datasets:
     lines = [line + "\n" for line in lines]  # add the newline to end
     rep.append(lines)
 
-
 diff = difflib.Differ()
 for line in diff.compare(rep[0], rep[1]):
     if line[0] != "?":

@@ -1,4 +1,5 @@
 __author__ = 'p0054421'
+import numpy as np
 import os
 import os.path
 import re
@@ -6,13 +7,12 @@ import shutil
 import time
 from os.path import expanduser
 
-import numpy as np
 import pydicom
+
+from anonymisator import anonymize
 
 patate = '/home/p0054421/Downloads/testDicom/'
 
-
-# a = glob.glob(patate)
 def contained_dirs(dir):
     return filter(os.path.isdir,
                   [os.path.join(dir, f) for f in os.listdir(dir)])
@@ -72,10 +72,8 @@ def rangator(folder):
             for i in xrange(len(splitname)):
                 if i < lenn:
                     initiales += splitname[i][:1]
-                    print initiales, splitname[i][:1]
                 else:
                     initiales += splitname[i][:3]
-                    print initiales, splitname[i][:3]
 
             date = imm.AcquisitionDate
             patient_folder_new = patient_folder + '/AAA_' + initiales
@@ -102,94 +100,13 @@ def rangator(folder):
                 print 'not exist'
                 os.makedirs(patient_folder_new)
                 shutil.move(subfolder_name, patient_folder_new)
-            #
-
             print 'movint to next acquisition'
             print ''
     return
-def anonymisator(fname):
-
-    """
-    n [71]: imm.PatientName
-    Out[71]: 'H863397'
-    In [72]: imm.PatientID
-    Out[72]: 'FLOW C-SL 863397'
-    """
-    kepttags = ['SpecificCharacterSet',
-                'ImageType',
-                'SOPClassUID',
-                'SOPInstanceUID',
-                'StudyDate',
-                'SeriesDate',
-                'AcquisitionDate',
-                'ContentDate',
-                'StudyTime',
-                'SeriesTime',
-                'AcquisitionTime',
-                'ContentTime',
-                'Modality',
-                'Manufacturer',
-                'InstitutionName',
-                'StationName',
-                'StudyDescription',
-                'SeriesDescription',
-                'ManufacturerModelName',
-                'DerivationDescription',
-                'GroupLength',
-                'PatientBirthDate',
-                'PatientSex',
-                'PatientAge',
-                'BodyPartExamined',
-                'SliceThickness',
-                'KVP',
-                'DataCollectionDiameter',
-                'ProtocolName',
-                'ReconstructionDiameter',
-                'DistanceSourcetoDetector',
-                'DistanceSourcetoPatientGantry',
-                'DetectorTilt',
-                'TableHeight',
-                'RotationDirection',
-                'ExposureTime',
-                'XRayTubeCurrent',
-                'ExposureTime',
-                'FilterType',
-                'GeneratorPower',
-                'FocalSpot',
-                'ConvolutionKernel',
-                'PatientPosition',
-                'GroupLength',
-                'StudyInstanceUID',
-                'SeriesInstanceUID',
-                'StudyID',
-                'SeriesNumber',
-                'AcquisitionNumber',
-                'InstanceNumber',
-                'ImagePositionPatient',
-                'ImageOrientationPatient',
-                'FrameofReferenceUID',
-                'PositionReferenceIndicator',
-                'SliceLocation',
-                'GroupLength',
-                'SamplesperPixel',
-                'PhotometricInterpretation',
-                'Rows',
-                'Columns',
-                'PixelSpacing',
-                'BitsAllocated',
-                'BitsStored',
-                'HighBit',
-                'WindowCenter',
-                'WindowWidth',
-                'RescaleIntercept',
-                'RescaleSlope',
-                'GroupLength']
-
-
+def anon(fname):
     patient_list = contained_dirs(fname)
 
     for i in patient_list:
-        # print os.listdir(i)
         if not os.listdir(i):
             continue
         elif os.path.split(os.path.split(i)[1])[1][:4] == 'AAA_':
@@ -202,25 +119,17 @@ def anonymisator(fname):
                 ll = 0
                 for k in filenames:
                     image = j + '/' + k
-                    # print image
                     ds = pydicom.read_file(image)
-                    dllist = ds.dir('')
                     ID = ds.PatientID
-                    PN = ds.PatientName
-                    for t in dllist:
-                        if t in kepttags:
-                            continue
-                        elif t == 'PatientName':
-                            ds.PatientName = ID
-                        elif t == 'PatientID':
-                            ds.PatientID = 'FLOW_' + os.path.split(i)[1] +'_'+ID
-                        else:
-                            setattr(ds, t, '')
+                    new_PN = ID
+                    new_ID = 'FLOW_' + os.path.split(i)[1] +'_'+ID
+
+                    anonymize(image, image, new_person_name=new_PN,
+              new_patient_id=new_ID, remove_curves=True, remove_private_tags=True)
+
                     if ll % 50 == 0:
                         print 'anonymized', ll, 'over', len(filenames)
                     ll += 1
-                    outname = image
-                    ds.save_as(outname)
 
         else:
             continue
@@ -231,5 +140,4 @@ def anonymisator(fname):
 
 
 rangator(patate)
-# out = '/home/p0054421/Downloads/testDicom/anon.dcm'
-anonymisator(patate)
+anon(patate)
