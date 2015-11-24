@@ -19,7 +19,39 @@ def contained_dirs(dir):
                   [os.path.join(dir, f) for f in os.listdir(dir)])
 
 
-def rangator(folder):
+def anon(fname):
+    patient_list = contained_dirs(fname)
+
+    for i in patient_list:
+        if not os.listdir(i):
+            continue
+        elif os.path.split(os.path.split(i)[1])[1][:4] == 'AAA_':
+            acquis_list = contained_dirs(i)
+            for j in acquis_list:
+                f = []
+                for (dirpath, dirnames, filenames) in os.walk(j):
+                    f.extend(filenames)
+                    break
+                ll = 0
+                for k in filenames:
+                    image = j + '/' + k
+                    ds = pydicom.read_file(image)
+                    ID = ds.PatientID
+                    new_PN = ID
+                    new_ID = 'FLOW_' + os.path.split(i)[1] + '_' + ID
+                    anonymize(image, image, new_person_name=new_PN,
+                              new_patient_id=new_ID, remove_curves=True, remove_private_tags=True)
+
+                    if ll % 50 == 0:
+                        print 'anonymized', ll, 'over', len(filenames)
+                    ll += 1
+
+        else:
+            continue
+    return
+
+
+def rangator(folder, anonimisation=True):
     aquis_list = contained_dirs(folder)
     tmp = expanduser("~") + '/tmp/'
     if not os.path.exists(tmp):
@@ -103,40 +135,11 @@ def rangator(folder):
                 shutil.move(subfolder_name, patient_folder_new)
             print 'movint to next acquisition'
             print ''
+
+    if anonimisation:
+        anon(patate)
+
     return
 
 
-def anon(fname):
-    patient_list = contained_dirs(fname)
-
-    for i in patient_list:
-        if not os.listdir(i):
-            continue
-        elif os.path.split(os.path.split(i)[1])[1][:4] == 'AAA_':
-            acquis_list = contained_dirs(i)
-            for j in acquis_list:
-                f = []
-                for (dirpath, dirnames, filenames) in os.walk(j):
-                    f.extend(filenames)
-                    break
-                ll = 0
-                for k in filenames:
-                    image = j + '/' + k
-                    ds = pydicom.read_file(image)
-                    ID = ds.PatientID
-                    new_PN = ID
-                    new_ID = 'FLOW_' + os.path.split(i)[1] + '_' + ID
-                    anonymize(image, image, new_person_name=new_PN,
-                              new_patient_id=new_ID, remove_curves=True, remove_private_tags=True)
-
-                    if ll % 50 == 0:
-                        print 'anonymized', ll, 'over', len(filenames)
-                    ll += 1
-
-        else:
-            continue
-    return
-
-
-rangator(patate)
-anon(patate)
+rangator(patate, )
