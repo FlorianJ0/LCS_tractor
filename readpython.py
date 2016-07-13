@@ -42,6 +42,7 @@ else:
             k += 1
         print 'shit\'s read'
 
+
         llength = cell.GetNumberOfPoints()
         pos = []  # np.empty([llength, 3])  # pos, u, vort
         u = []  # np.empty([llength, 3])  # pos, u, vort
