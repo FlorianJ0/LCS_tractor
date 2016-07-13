@@ -1,10 +1,13 @@
 __author__ = 'p0054421'
 __date__ = '30 Juillet 2015'
 
-import numpy as np
 from scipy import *
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import numpy as np
+
+# from pyqtgraph.Qt import QtGui, QtCore
+# import pyqtgraph as pg
 # from vtk.util import numpy_support as vn
 # import pygsl._numobj as numx
 import time
@@ -181,8 +184,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         # a = np.array(
         #     [interpu(coord) * invddx, interpv(coord) * invddy, interpw(coord) * invddz])
 
-        u = ndimage.map_coordinates(velpu, [[yy[0]], [yy[1]], [yy[2]], [t]], order=3, mode='constant', cval=0.0,
-                                    prefilter=False) * invddx
+        u = ndimage.map_coordinates(velpu, [[yy[0]], [yy[1]], [yy[2]], [t]], order=3, mode='constant', cval=0.0, prefilter=False) * invddx
         v = ndimage.map_coordinates(velpv, [[yy[0]], [yy[1]], [yy[2]], [t]], order=3, mode='constant', cval=0.0,
                                     prefilter=False) * invddy
         w = ndimage.map_coordinates(velpw, [[yy[0]], [yy[1]], [yy[2]], [t]], order=3, mode='constant', cval=0.0,
@@ -234,7 +236,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
 
         for i in xrange(nnx):
             for j in xrange(nny):
-                for k in range(tranche - 2, tranche + 3):
+                for k in range(tranche - 0, tranche + 1):
                     y0 = grid_iini[:, i, j, k]
 
                     if np.all(np.abs(velp[i, j, k, :, 0]) > np.array([1e-7, 1e-7, 1e-7])):
@@ -467,6 +469,26 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         print 'Flow map and eigval/eigvec computed in %f s ' % (time.time() - stamp)
         print '-----------------------------------------------------'
 
+
+
+
+
+
+        # p1 = win.addPlot(title="Basic array plotting", y=np.random.normal(size=100))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         f, ((ax1, ax2, ax3), (ax4, ax5, ax6), (ax7, ax8, ax9)) = plt.subplots(3, 3, sharex=True, sharey=True)
         # print didx.shape
         # Y, X = np.mgrid[0:nx * dx:rr * nx * 1j, 0:ny * dy:rr * ny * 1j]
@@ -500,6 +522,11 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         # ax4.streamplot(X, Y, uu, vv, density=0.6, color='k', linewidth=magx)
 
         plt.show()
+
+
+
+
+
 
     print '-------------------------'
     print 'error', np.random.random_integers(0, 100)

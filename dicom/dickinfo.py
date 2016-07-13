@@ -1,5 +1,4 @@
 __author__ = 'p0054421'
-import numpy as np
 import os
 import os.path
 import re
@@ -7,11 +6,12 @@ import shutil
 import time
 from os.path import expanduser
 
+import numpy as np
 import pydicom
 
 from anonymisator import anonymize
 
-patate = '/home/p0054421/Downloads/testDicom/'
+patate = '/home/p0054421/Downloads/testDicom/test/'
 
 
 def contained_dirs(dir):

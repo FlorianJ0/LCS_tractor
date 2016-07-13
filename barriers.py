@@ -1,10 +1,12 @@
 __author__ = 'p0054421'
-import time
 import ConfigParser
+import time
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
+# from pyqtgraph.Qt import QtGui, QtCore
+# import pyqtgraph as pg
 
 
 # from Scientific.Functions.Interpolation import InterpolatingFunction as IF
@@ -202,6 +204,25 @@ def barrier_type(toto, eigval1, eigval3, eigvec1, eigvec3, vel, tphys, dt, nx, n
 
     ftle = (1 / 0.16) * np.log(np.sqrt(eigval3 + 1e-8))
     magU = np.sqrt(vel[:, :, 7, 0, 0] ** 2 + vel[:, :, 7, 1, 0] ** 2 + vel[:, :, 7, 2, 0] ** 2)
+
+
+    #
+    #
+    #
+    # win = pg.GraphicsWindow(title="Basic plotting examples")
+    # win.resize(1000,600)
+    # win.setWindowTitle('pyqtgraph example: Plotting')
+    # # Enable antialiasing for prettier plots
+    # pg.setConfigOptions(antialias=True)
+    #
+    # p1 = win.addPlot(title="Basic array plotting", y=np.random.normal(size=100))
+    #
+    # p2 = win.addPlot(title="Multiple curves")
+    # p2.plot(np.random.normal(size=100), pen=(255,0,0), name="Red curve")
+    # p2.plot(np.random.normal(size=110)+5, pen=(0,255,0), name="Blue curve")
+    # p2.plot(np.random.normal(size=120)+10, pen=(0,0,255), name="Green curve")
+    #
+    # QtGui.QApplication.instance().exec_()
 
     plt.subplot(221)
     # eigval3 /=np.max(np.abs(eigval3-100))

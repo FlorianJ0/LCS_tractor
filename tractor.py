@@ -5,38 +5,40 @@ __date__ = '30 Juillet 2015'
 'obj: calculer les  LCS hyperboliques depuis un champ de vitesse, ecoulement incompressible, periodique de sang dans un' \
 'AAA. Si possible ajouter LCS  elliptic et parabolic si j ai le temps. Le tout sur du vtk structured'
 #
-import time
 import ConfigParser
+import time
 
 import numpy as np
 
-import readUvtk
 import barriers
-import cauchygreen3d
-import gyronator
-import readUvtk_unstructured
+import readpaths
+
+# import cauchygreen3d
 import sup3D
+import integrator
+# from pyqtgraph.Qt import QtGui, QtCore
+# import pyqtgraph as pg
 
 ttot = time.time()
 Config = ConfigParser.ConfigParser()
 Config.read('parameters.ini')
 
+mode = 'readvtk'
 
-# a = np.arange(10e7)
-# b = np.arange(0, 20e7, 2)
-#
-# tttt = time.time()
-# ne.ncores = 4
-# c = ne.evaluate("2*a+3*b")
-# print (time.time()-tttt)
-# tttt = time.time()
-# c = 2*a+3*b
-# print (time.time()-tttt)
-# quit()
-# print c
+if mode == 'readvtk':
+    import readUvtk_unstructured
+    import readUvtk
+elif mode == 'analytic':
+    import gyronator
+else:
+    print('wrong mode')
+    quit()
+
 def ConfigSectionMap(section):
     dict1 = {}
     options = Config.options(section)
+    print options
+
     for option in options:
         try:
             dict1[option] = Config.get(section, option)
@@ -50,12 +52,12 @@ def ConfigSectionMap(section):
 
 # vitesse min pour savoir si on est in/out domain (a mettre a -100 pour la suite)
 outofdomain = ConfigSectionMap('filereading')['outofdomain']
-# instat = True
 # t step de la simu
 simtstep = ConfigSectionMap('filereading')['timestep']
 # read file/s
 loc = ConfigSectionMap('filereading')['folder']
-
+a = readpaths.read_files(loc)
+quit()
 print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 print 'Goord morning %s' % sup3D.hello()
 print 'Welcome in my lair.'
@@ -73,11 +75,13 @@ elif struct == 'anal':
     vel, nx, ny, nz, dim_initial, tphys, dt, domain = gyronator.gyro()
 else:
     print 'wut ?'
-    #quit()
+    # quit()
 
 print '-----------------------------------------------------'
 print 'Velocity read in %f s ' % (time.time() - stamp)
 print '-----------------------------------------------------'
+
+
 
 """
 -sur [t0, t0+T] et n grilles G0 de PI 2D uniformes recti sur z (parceque ca m'arrange)
@@ -95,9 +99,10 @@ z = float(z)
 # t = 3
 # calcul sur un plan x y parceque jsuis trop une feignasse pour un code generique
 dim = 2
-
-eigval1, eigval3, eigvec1, eigvec3, interpU_i, bobol = cauchygreen3d.cgstki3(vel, z, tphys, dt, nx, ny, nz, 3, domain,
-                                                                             simtstep)
+integrator.Integrator(vel, z, tphys, dt, nx, ny, nz, 3, domain,simtstep)
+quit()
+# eigval1, eigval3, eigvec1, eigvec3, interpU_i, bobol = cauchygreen3d.cgstki3(vel, z, tphys, dt, nx, ny, nz, 3, domain,
+                                                                             # simtstep)
 barriers.barrier_type(0, eigval1, eigval3, eigvec1, eigvec3, interpU_i, tphys, dt, nx, ny, nz, domain, simtstep, bobol)
 print '-----------------------------------------------------'
 print 'full total time  in %f s ' % (time.time() - ttot)
