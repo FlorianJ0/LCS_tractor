@@ -6,16 +6,15 @@ __date__ = '30 Juillet 2015'
 'AAA. Si possible ajouter LCS  elliptic et parabolic si j ai le temps. Le tout sur du vtk structured'
 #
 import ConfigParser
+import sys
 import time
 
-import numpy as np
-
 import barriers
-import readpaths
-
-# import cauchygreen3d
+import cauchygreen3d_v2
+import readUvtk
 import sup3D
-import integrator
+
+print 'python version:', sys.version_info
 # from pyqtgraph.Qt import QtGui, QtCore
 # import pyqtgraph as pg
 
@@ -23,16 +22,18 @@ ttot = time.time()
 Config = ConfigParser.ConfigParser()
 Config.read('parameters.ini')
 
-mode = 'readvtk'
+mode = 'paraviewpaths'
 
 if mode == 'readvtk':
-    import readUvtk_unstructured
     import readUvtk
 elif mode == 'analytic':
-    import gyronator
+    pass
+elif mode == 'paraviewpaths':
+    pass
 else:
     print('wrong mode')
     quit()
+
 
 def ConfigSectionMap(section):
     dict1 = {}
@@ -56,32 +57,39 @@ outofdomain = ConfigSectionMap('filereading')['outofdomain']
 simtstep = ConfigSectionMap('filereading')['timestep']
 # read file/s
 loc = ConfigSectionMap('filereading')['folder']
-a = readpaths.read_files(loc)
-quit()
+# a = readpaths.read_files(loc)
+# quit()
 print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 print 'Goord morning %s' % sup3D.hello()
 print 'Welcome in my lair.'
 print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 stamp = time.time()
-struct = ConfigSectionMap('filereading')['datastruct']
-if struct == 'unstruct':
-    extend = np.array([0.05, 0.15, 0.04, 0.14, 0.2, 0.3])
-    dim = np.array([20, 20, 20])
-    vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk_unstructured.read_files(loc, dim, extend)
-    # quit()
-elif struct == 'struct':
-    vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk.read_files(loc)
-elif struct == 'anal':
-    vel, nx, ny, nz, dim_initial, tphys, dt, domain = gyronator.gyro()
-else:
-    print 'wut ?'
-    # quit()
+# struct = ConfigSectionMap('filereading')['datastruct']
+# struct = "pv"
+# if struct == 'unstruct':
+#     extend = np.array([0.05, 0.15, 0.04, 0.14, 0.2, 0.3])
+#     dim = np.array([20, 20, 20])
+#     vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk_unstructured.read_files(loc, dim, extend)
+#     # quit()
+# elif struct == 'struct':
+vel, nx, ny, nz, dim_initial, tphys, dt, domain = readUvtk.read_files(loc)
+# elif struct == 'anal':
+#     vel, nx, ny, nz, dim_initial, tphys, dt, domain = gyronator.gyro()
+# elif struct == 'pv':
+# data = readpython.read_paths(loc)
+#
+# else:
+#     print 'wut ?'
+#     # quit()
 
 print '-----------------------------------------------------'
 print 'Velocity read in %f s ' % (time.time() - stamp)
 print '-----------------------------------------------------'
 
-
+# print data.shape
+# cgreen.green(data, loc)
+#
+# quit()
 
 """
 -sur [t0, t0+T] et n grilles G0 de PI 2D uniformes recti sur z (parceque ca m'arrange)
@@ -98,11 +106,15 @@ z = ConfigSectionMap('cauchygreen')['z']
 z = float(z)
 # t = 3
 # calcul sur un plan x y parceque jsuis trop une feignasse pour un code generique
-dim = 2
-integrator.Integrator(vel, z, tphys, dt, nx, ny, nz, 3, domain,simtstep)
+dim = 3
+
+# integrator.Integrator(vel, z, tphys, dt, nx, ny, nz, 3, domain, simtstep)
+# eigval1, eigval3, eigvec1, eigvec3, interpU_i, bobol = \\
+t0 = time.time()
+cauchygreen3d_v2.cgstki3(vel, z, tphys, dt, nx, ny, nz, 3, domain,simtstep)
+print 'CG computation time  = ', time.time()-t0
 quit()
-# eigval1, eigval3, eigvec1, eigvec3, interpU_i, bobol = cauchygreen3d.cgstki3(vel, z, tphys, dt, nx, ny, nz, 3, domain,
-                                                                             # simtstep)
+
 barriers.barrier_type(0, eigval1, eigval3, eigvec1, eigvec3, interpU_i, tphys, dt, nx, ny, nz, domain, simtstep, bobol)
 print '-----------------------------------------------------'
 print 'full total time  in %f s ' % (time.time() - ttot)

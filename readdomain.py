@@ -68,7 +68,6 @@ def read_files(loc):
     dt = 0.05
     tphys = count * dt
     print 'tphys = ', tphys
-    print 'Files read'
-    print '<<<<<<<<<>>>>>>>>>>'
+    print 'end of domain properties reading'
 
-    return U, nx, ny, nz, dim, tphys, dt, domain
+    return nx, ny, nz, dim, tphys, dt, domain
