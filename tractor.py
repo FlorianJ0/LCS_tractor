@@ -9,10 +9,11 @@ import ConfigParser
 import sys
 import time
 
-import barriers
+# import barriers
 import cauchygreen3d_v2
 import readUvtk
 import sup3D
+import stressStrainLines
 
 print 'python version:', sys.version_info
 # from pyqtgraph.Qt import QtGui, QtCore
@@ -113,10 +114,10 @@ dim = 3
 t0 = time.time()
 CGtensor, eigval1, eigval3, eigvec1, eigvec3 = cauchygreen3d_v2.cgstki3(vel, z, tphys, dt, nx, ny, nz, 3, domain,simtstep)
 print 'CG computation time  = ', time.time()-t0
-
+stressStrainLines.strainLines(vel, CGtensor, eigval1, eigval3, eigvec1, eigvec3, domain, tphys, dt,simtstep)
 quit()
 
-barriers.barrier_type(0, eigval1, eigval3, eigvec1, eigvec3, interpU_i, tphys, dt, nx, ny, nz, domain, simtstep, bobol)
+# barriers.barrier_type(0, eigval1, eigval3, eigvec1, eigvec3, interpU_i, tphys, dt, nx, ny, nz, domain, simtstep, bobol)
 print '-----------------------------------------------------'
 print 'full total time  in %f s ' % (time.time() - ttot)
 print '-----------------------------------------------------'

@@ -231,5 +231,14 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
                 eigval3[i, j, k] = eigenValues[i, j, k, maxeig]
                 eigvec1[i, j, k, :] = eigenVectors[i, j, k, :, mineig]
                 eigvec3[i, j, k, :] = eigenVectors[i, j, k, :, maxeig]
+    print " eigVal, eigVec computed"
+    plot = 0
+    if plot:
+        fig = plt.figure()
+        ax1 = fig.add_subplot(211)
+        ax1.imshow(eigval3[:, :, int(nz / 2)])
+        ax2 = fig.add_subplot(212)
+        ax2.imshow(eigval1[:, :, int(nz / 2)])
+        plt.show()
 
     return ggrid, eigval1, eigval3, eigvec1, eigvec3

@@ -77,7 +77,7 @@ def green(traj, fold):
         mappedPos = np.load(mappedPosFile + '.npy')
         print "interp file loaded"
 
-    plot = 1
+    plot = 0
     if plot:
         fig = plt.figure()
         ax1 = fig.add_subplot(311)
@@ -134,9 +134,8 @@ def green(traj, fold):
                 ggrid[i, j, k, 2, 2] = splinez([ii, jj, kkp]) - splinez([ii, jj, kkm])
 
     ggrid /= 2 * ddx
-    plot = 1
     print "CG tensor computed in ", time.time() - t0, 's'
-
+    plot = 0
     if plot:
         fig = plt.figure()
         ax1 = fig.add_subplot(311)
