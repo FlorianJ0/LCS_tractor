@@ -111,8 +111,9 @@ dim = 3
 # integrator.Integrator(vel, z, tphys, dt, nx, ny, nz, 3, domain, simtstep)
 # eigval1, eigval3, eigvec1, eigvec3, interpU_i, bobol = \\
 t0 = time.time()
-cauchygreen3d_v2.cgstki3(vel, z, tphys, dt, nx, ny, nz, 3, domain,simtstep)
+CGtensor, eigval1, eigval3, eigvec1, eigvec3 = cauchygreen3d_v2.cgstki3(vel, z, tphys, dt, nx, ny, nz, 3, domain,simtstep)
 print 'CG computation time  = ', time.time()-t0
+
 quit()
 
 barriers.barrier_type(0, eigval1, eigval3, eigvec1, eigvec3, interpU_i, tphys, dt, nx, ny, nz, domain, simtstep, bobol)

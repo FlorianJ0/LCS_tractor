@@ -1,20 +1,22 @@
 __author__ = 'p0054421'
 __date__ = '30 Juillet 2015'
 
-from numba import jit
-from scipy import *
+import ConfigParser
 
-# from __future__ import print_function
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy import linalg as LA
+from scipy import *
+
 from interpolation.splines import LinearSpline, CubicSpline
-import ConfigParser
 
 # noinspection PyPep8Naming
 Config = ConfigParser.ConfigParser()
 Config.read('parameters.ini')
-# cubic interp ? if 0 then linear
-cubic = 1
+# cubic interp ? if 0 then linear ADVECTION
+cubicADV = 1
+# cubic interp ? if 0 then linear CGtensor
+cubicCG = 0
 
 
 def ConfigSectionMap(section):
@@ -66,7 +68,7 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     velpu = velp[:, :, :, 0, :]
     velpv = velp[:, :, :, 1, :]
     velpw = velp[:, :, :, 2, :]
-    if cubic:
+    if cubicADV:
         linx = CubicSpline(a, b, orders, velpu)
         liny = CubicSpline(a, b, orders, velpv)
         linz = CubicSpline(a, b, orders, velpw)
@@ -134,38 +136,75 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
     b = np.array([maxx, maxy, maxz])  # upper boundaries
 
     orders = np.array([nx, ny, nz])
+    if cubicCG:
+        FMx = CubicSpline(a, b, orders, pos_final[:, :, :, 0])
+        FMy = CubicSpline(a, b, orders, pos_final[:, :, :, 1])
+        FMz = CubicSpline(a, b, orders, pos_final[:, :, :, 2])
+    else:
+        FMx = LinearSpline(a, b, orders, pos_final[:, :, :, 0])
+        FMy = LinearSpline(a, b, orders, pos_final[:, :, :, 1])
+        FMz = LinearSpline(a, b, orders, pos_final[:, :, :, 2])
 
-    FMx = CubicSpline(a, b, orders, pos_final[:, :, :, 0])
-    FMy = CubicSpline(a, b, orders, pos_final[:, :, :, 1])
-    FMz = CubicSpline(a, b, orders, pos_final[:, :, :, 2])
+        pos_x, pos_y, pos_z = np.mgrid[minx:maxx - dx:nx * 1j, miny:maxy - dx:ny * 1j,
+                              minz:maxz - dx:nz * 1j]
 
-    @jit
-    def CG():
-        ggrid = np.empty([nx, ny, nz, 3, 3])
-        delta = 1e-4
-        for i in xrange(nx):
-            x = minx + i * dx
-            for j in xrange(ny):
-                y = miny + j * dy
-                for k in xrange(nz):
-                    z = minz + k * dz
-                    ggrid[i, j, k, 0, 0] = FMx(np.array([x + delta, y, z])) - FMx(np.array([x - delta, y, z]))
-                    ggrid[i, j, k, 0, 1] = FMx(np.array([x, y + delta, z])) - FMx(np.array([x, y - delta, z]))
-                    ggrid[i, j, k, 0, 2] = FMx(np.array([x, y, z + delta])) - FMx(np.array([x, y, z - delta]))
+    pos_x = pos_x.ravel()
+    pos_y = pos_y.ravel()
+    pos_z = pos_z.ravel()
+    delta = 1e-4
 
-                    ggrid[i, j, k, 1, 0] = FMy(np.array([x + delta, y, z])) - FMy(np.array([x - delta, y, z]))
-                    ggrid[i, j, k, 1, 1] = FMy(np.array([x, y + delta, z])) - FMy(np.array([x, y - delta, z]))
-                    ggrid[i, j, k, 1, 2] = FMy(np.array([x, y, z + delta])) - FMy(np.array([x, y, z - delta]))
+    ap = np.empty([pos_x.shape[0], 3])
+    ap[:, 0] = pos_x + delta
+    ap[:, 1] = pos_y
+    ap[:, 2] = pos_z
+    am = np.empty([pos_x.shape[0], 3])
+    am[:, 0] = pos_x - delta
+    am[:, 1] = pos_y
+    am[:, 2] = pos_z
+    g00 = (FMx(ap) - FMx(am)) / (2 * delta)
+    g10 = (FMy(ap) - FMy(am)) / (2 * delta)
+    g20 = (FMz(ap) - FMz(am)) / (2 * delta)
 
-                    ggrid[i, j, k, 2, 0] = FMz(np.array([x + delta, y, z])) - FMz(np.array([x - delta, y, z]))
-                    ggrid[i, j, k, 2, 1] = FMz(np.array([x, y + delta, z])) - FMz(np.array([x, y - delta, z]))
-                    ggrid[i, j, k, 2, 2] = FMz(np.array([x, y, z + delta])) - FMz(np.array([x, y, z - delta]))
+    ap = np.empty([pos_x.shape[0], 3])
+    ap[:, 0] = pos_x
+    ap[:, 1] = pos_y + delta
+    ap[:, 2] = pos_z
+    am = np.empty([pos_x.shape[0], 3])
+    am[:, 0] = pos_x
+    am[:, 1] = pos_y - delta
+    am[:, 2] = pos_z
+    g01 = (FMx(ap) - FMx(am)) / (2 * delta)
+    g11 = (FMy(ap) - FMy(am)) / (2 * delta)
+    g21 = (FMz(ap) - FMz(am)) / (2 * delta)
 
-        ggrid /= 2 * delta
-        return ggrid
+    ap = np.empty([pos_x.shape[0], 3])
+    ap[:, 0] = pos_x
+    ap[:, 1] = pos_y
+    ap[:, 2] = pos_z + delta
+    am = np.empty([pos_x.shape[0], 3])
+    am[:, 0] = pos_x
+    am[:, 1] = pos_y
+    am[:, 2] = pos_z - delta
+    g02 = (FMx(ap) - FMx(am)) / (2 * delta)
+    g12 = (FMy(ap) - FMy(am)) / (2 * delta)
+    g22 = (FMz(ap) - FMz(am)) / (2 * delta)
 
-    ggrid = CG()
-    plot = 1
+    ggrid = np.empty([nx, ny, nz, 3, 3])
+    ind = 0
+    for i in xrange(nx):
+        for j in xrange(ny):
+            for k in xrange(nz):
+                ggrid[i, j, k, 0, 0] = g00[ind]
+                ggrid[i, j, k, 0, 1] = g01[ind]
+                ggrid[i, j, k, 0, 2] = g02[ind]
+                ggrid[i, j, k, 1, 0] = g10[ind]
+                ggrid[i, j, k, 1, 1] = g11[ind]
+                ggrid[i, j, k, 1, 2] = g12[ind]
+                ggrid[i, j, k, 2, 0] = g20[ind]
+                ggrid[i, j, k, 2, 1] = g21[ind]
+                ggrid[i, j, k, 2, 2] = g22[ind]
+                ind += 1
+    plot = 0
     if plot:
         fig = plt.figure()
         ax1 = fig.add_subplot(311)
@@ -176,7 +215,21 @@ def cgstki3(velp, zplan, tt, dt, nx, ny, nz, dim, domain, simtstep):
         ax3.imshow(ggrid[:, :, int(nz / 2), 2, 2])
         plt.show()
 
-    #
+    print " CG tensor computed"
+    eigenValues, eigenVectors = LA.eig(ggrid)
 
+    eigvec1 = np.empty((nx, ny, nz, 3))
+    eigvec3 = np.empty((nx, ny, nz, 3))
+    eigval1 = np.empty((nx, ny, nz))
+    eigval3 = np.empty((nx, ny, nz))
+    for i in xrange(nx):
+        for j in xrange(ny):
+            for k in xrange(nz):
+                mineig = np.argmin(eigenValues[i, j, k, :])
+                maxeig = np.argmax(eigenValues[i, j, k, :])
+                eigval1[i, j, k] = eigenValues[i, j, k, mineig]
+                eigval3[i, j, k] = eigenValues[i, j, k, maxeig]
+                eigvec1[i, j, k, :] = eigenVectors[i, j, k, :, mineig]
+                eigvec3[i, j, k, :] = eigenVectors[i, j, k, :, maxeig]
 
-    return
+    return ggrid, eigval1, eigval3, eigvec1, eigvec3
